@@ -30,31 +30,33 @@ stretch, and every rule in here has a real incident behind it.
 
 ```mermaid
 flowchart TB
-    subgraph LOOP["Agent, 24/7 loop"]
-        Q["the queue<br/>docs/TODO.md<br/>take the next · tick it off"]
-        D{"key decision?"}
-        T2["run it + watch it<br/>run_task.sh · monitoring.md"]
-        PV["leave evidence<br/>docs/PROVENANCE.md"]
-        RL["log the incident<br/>docs/RULES.md"]
-        Q --> D
-        D -->|"no · on its own"| T2
-        T2 --> PV
-        T2 --> RL
-        PV --> Q
-        RL --> Q
-        D -->|"meanwhile take one that does not depend on it"| Q
+    subgraph CORE["the core loop"]
+        Q["the queue<br/>docs/TODO.md"]
+        T["run the task<br/>scripts/run_task.sh"]
+        R["log the incident<br/>docs/RULES.md"]
+        Q -->|"no · proceed on its own"| T
+        T --> R
+        R --> Q
     end
+
+    Q --- D{"key<br/>decision?"}
     D -->|"yes · parked as blocked, waiting on you"| HU(["you"])
     HU -->|"decision made · back on the queue"| Q
     Q ==>|"review the queue every 4h"| HU
 
-    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
-    classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
+    T -.->|"one entry per run"| PV(["experiment log<br/>docs/PROVENANCE.md"])
+    MO(["the monitor<br/>docs/monitoring.md"]) -.->|"watches"| T
+    MO -.->|"crashed · requeue it"| Q
+
+    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
+    classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC
+    classDef ext fill:#F1F5F9,stroke:#94A3B8,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class Q,T2,PV,RL step
+    class Q,T,R step
     class D gate
+    class MO,PV ext
     class HU human
-    style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
+    style CORE fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
 
 ## Quick start

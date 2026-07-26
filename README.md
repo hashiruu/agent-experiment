@@ -21,31 +21,33 @@
 
 ```mermaid
 flowchart TB
-    subgraph LOOP["Agent 7×24 循环"]
-        Q["TODO 队列<br/>docs/TODO.md<br/>取下一件 · 做完勾掉"]
-        D{"关键决策?"}
-        T2["起任务 + 盯崩溃<br/>run_task.sh · monitoring.md"]
-        PV["留证据<br/>docs/PROVENANCE.md"]
-        RL["回写踩坑<br/>docs/RULES.md"]
-        Q --> D
-        D -->|"否 · 自行推进"| T2
-        T2 --> PV
-        T2 --> RL
-        PV --> Q
-        RL --> Q
-        D -->|"同时做不依赖它的下一件"| Q
+    subgraph CORE["核心循环"]
+        Q["TODO 队列<br/>docs/TODO.md"]
+        T["起任务<br/>scripts/run_task.sh"]
+        R["回写踩坑<br/>docs/RULES.md"]
+        Q -->|"否 · 自行推进"| T
+        T --> R
+        R --> Q
     end
-    D -->|"是 · 挂进阻塞区，等你决策"| HU(["你"])
+
+    Q --- D{"关键<br/>决策?"}
+    D -->|"是 · 挂进阻塞区等你决策"| HU(["你"])
     HU -->|"决策给出 · 重新入队"| Q
     Q ==>|"每 4h 复核队列"| HU
 
-    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
-    classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
+    T -.->|"每次运行记一笔"| PV(["实验日志<br/>docs/PROVENANCE.md"])
+    MO(["监控程序<br/>docs/monitoring.md"]) -.->|"盯着"| T
+    MO -.->|"崩了 · 回队列重排"| Q
+
+    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
+    classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC
+    classDef ext fill:#F1F5F9,stroke:#94A3B8,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class Q,T2,PV,RL step
+    class Q,T,R step
     class D gate
+    class MO,PV ext
     class HU human
-    style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
+    style CORE fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
 
 ## 快速开始
