@@ -65,7 +65,7 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
 
 完成 —— 目标: /path/to/your/project
 (预览模式: 什么都没写)
-下一步: 在看到任何结果之前, 先把 docs/PROVENANCE.md 的判据填掉。
+下一步: 在看到任何结果之前, 先把 docs/PROVENANCE.md 的判断标准填掉。
 ```
 
 The script speaks Chinese, like the rules it deploys.
@@ -216,18 +216,12 @@ bash ~/where-you-cloned/agent-workflow-template/install.sh --project
 Queue never idle, resume from checkpoint, land every result the moment it exists.
 Seven days covered close to what half a year used to.
 
-The caveat, so nobody reads it as a benchmark: this is the author's own
-before-and-after with no control group, and "work" means experiment batches plus
-paper revision rounds, not any single metric. Keep two things apart. **The speed
-comes from never stopping** - no babysitting the machine, no restart from zero
-after a crash, no results piling up until the weekend - and any 24/7 setup gets
-that. **What the 26 rules buy is that the output is trustworthy**, instead of
-another round of "the marker was from last time and the table disagrees with the
-prose". Unattended without the rules just raises your error rate at the same
-speed. Your own multiplier depends on how interruptible your tasks are.
-
-None of the points below is aspirational. Each was paid for by an incident
-recorded in the rule file:
+Running unattended is the easy half. The hard part is trusting the results
+afterwards: the completion marker that turned out to be last round's, two chains
+writing into one directory, the table you updated while the prose still quotes
+the old number. Running unattended only makes those happen faster. The rules
+below exist to plug exactly those holes, and every one of them cost a real
+incident:
 
 - One OOM no longer destroys the whole chain. Staged artifacts plus per-pass
   switches mean a failure in the last step reruns only that step, and the cost
@@ -350,9 +344,9 @@ template. If you do not want it near Git, do not install L3: `--layers l1` or
 The rules are in Chinese. They were recorded in the language the incidents
 happened in, and translating them costs the precision that makes them usable.
 
-Dataset names and metric values in the examples are placeholders. The shape and
-magnitude of each incident is real; the specific numbers are not the source
-project's results.
+Dataset names and metric values in the rule examples have been replaced with
+stand-ins. The incidents and their magnitude are real, but the specific numbers
+are not the source project's results, so do not quote them.
 
 What was deliberately left out: dataset names, path conventions, thresholds,
 hyperparameters, GPU topology, quirks of one upstream repo. Those belong in a
