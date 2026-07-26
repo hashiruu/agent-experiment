@@ -11,7 +11,7 @@
 > up to date.
 
 Two steps: install the skill, then run one deployment inside your project. What
-lands there is 26 rules of long-horizon working discipline, three ledgers, and a
+lands there is 26 rules of long-horizon working discipline, three record files, and a
 task skeleton that resumes from checkpoints. The rules were not invented. They
 were paid for by a real project that ran unattended for a long stretch.
 
@@ -70,20 +70,20 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
 
 The script speaks Chinese, like the rules it deploys.
 
-| File | What it does | Overwritten on re-run? |
+| File | What it is for | Overwritten on re-run? |
 |---|---|---|
-| `CLAUDE.md` | the rules, inside a managed block | Only the block is refreshed. Anything you wrote outside it is untouched |
-| `docs/RULES.md` | project-specific incidents, appended as you go | No |
-| `docs/TODO.md` | FIFO queue + blocked items + cancelled items | No |
-| `docs/PROVENANCE.md` | number -> weights + code + logs, plus the criteria | No |
-| `scripts/run_task.sh` | task skeleton: resume, stale-marker guard, failure marks | No |
-| `.gitignore` | run artifacts, stamps, LaTeX intermediates | Appended once |
+| `CLAUDE.md` | the rules your agent reads before it starts work, all 26 of them, fenced between a pair of comment markers | only the text between the markers; anything you wrote outside them stays |
+| `docs/RULES.md` | what went wrong in *this* project and what to do next time. Starts empty; you add to it as you go | No |
+| `docs/TODO.md` | what is still to do, what is blocked waiting on someone, what was dropped | No |
+| `docs/PROVENANCE.md` | which file each published number came from, plus the criteria you fixed **before** looking | No |
+| `scripts/run_task.sh` | the script template for long runs: resumes after an interruption, never fakes success on failure | No |
+| `.gitignore` | keeps run artifacts, logs and LaTeX intermediates out of git | appended once, at the end |
 
 Once those four files under `docs/` and `scripts/` exist they belong to the
 project. Changing that takes `--force`.
 
 `run_task.sh` treats its own directory as the run root and writes only relative
-paths, so logs, results and checkpoint stamps land next to it under `scripts/`.
+paths, so logs, results and progress stamps land next to it under `scripts/`.
 That is deliberate: never write a global path (see L2 rule 14). Move the script
 if you want the artifacts elsewhere.
 
@@ -169,7 +169,7 @@ It does four things:
 For long runs, launch with `setsid nohup ./scripts/run_task.sh myrun 0 &` so that
 killing the monitor does not kill the compute chain.
 
-**Rerunning a step after you change the code**: stamps live in
+**Rerunning a step after you change the code**: progress stamps live in
 `scripts/.stamps/<tag>/`, one file per step. Delete a stamp and that step runs
 again; delete the directory and the whole chain does.
 
@@ -197,7 +197,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --force            # overwrite th
 | `--target DIR` | current directory | which project to deploy into |
 | `--layers l1,l2,l3` | all three | which layers to keep; an unknown layer name is an error, never a silently empty ruleset |
 | `--dry-run` | off | print what would happen, write nothing |
-| `--force` | off | allow overwriting those four existing files (three ledgers + `run_task.sh`) |
+| `--force` | off | allow overwriting those four existing files (three record files + `run_task.sh`) |
 
 For the installer: `--project` installs into `./.claude/skills/` of the **current
 directory**, scoped to that repo and committable for a team. It goes by where you
@@ -296,7 +296,7 @@ Yes. `--layers l1` installs 11 rules; change the flag and re-run to add more, an
 the block refreshes in place. Rule numbers are identical in every combination, so
 cross-references never break.
 
-**I have half-filled ledgers. Will a re-run wipe them?**
+**I have half-filled records. Will a re-run wipe them?**
 No. The four files under `docs/` and `scripts/` are never overwritten once they
 exist, unless you pass `--force` yourself.
 
@@ -368,7 +368,7 @@ does it still hold? If not, it stays where it was learned.
 install.sh                       installs the skill
 skills/agent-workflow/
   SKILL.md                       entry point: when to deploy, which layers
-  deploy.sh                      idempotent deployment, layer filtering
+  deploy.sh                      deployment script, safe to re-run, layer filtering
   assets/
     CLAUDE.md                    the 26 rules, L1 / L2 / L3
     gitignore.snippet

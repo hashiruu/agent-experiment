@@ -5,14 +5,14 @@
 #   ./deploy.sh [--target 目录] [--layers l1,l2,l3] [--force] [--dry-run]
 #
 # 会写进 <目标目录> 的东西:
-#   CLAUDE.md            规则本体, 放在托管块里(可反复重跑刷新)
+#   CLAUDE.md            规则本体, 夹在一对注释标记之间(可反复重跑, 只换这一段)
 #   docs/RULES.md        本项目特有的踩坑记录            (永不覆盖)
 #   docs/TODO.md         FIFO 队列 + 阻塞项 + 已取消项   (永不覆盖)
-#   docs/PROVENANCE.md   可追溯性索引 + 判据             (永不覆盖)
+#   docs/PROVENANCE.md   数字溯源索引 + 判断标准         (永不覆盖)
 #   scripts/run_task.sh  可断点续跑的任务骨架            (永不覆盖)
 #   .gitignore           追加模板的忽略规则              (只追加一次)
 #
-# 幂等: 重跑只刷新 CLAUDE.md 的托管块。四份台账建成后就归项目自己所有,
+# 可重复跑: 重跑只换 CLAUDE.md 里标记之间那一段。那四份文件建成后就归项目自己所有,
 # 真要覆盖用 --force。
 # =============================================================================
 set -euo pipefail
@@ -57,7 +57,7 @@ done
 say() { echo "  $*"; }
 act() { [ "$DRY" -eq 1 ] && say "[dry-run] $*" || say "$*"; }
 
-# --- 1. 生成 CLAUDE.md 托管块, 只保留选中的层 --------------------------------
+# --- 1. 生成要写进 CLAUDE.md 的那一段, 只保留选中的层 ------------------------
 BLOCK=$(mktemp); trap 'rm -f "$BLOCK" "$BLOCK.body"' EXIT
 awk -v layers="$LAYERS" '
     BEGIN { n = split(toupper(layers), a, ","); for (i = 1; i <= n; i++) sel[a[i]] = 1; keep = 1 }
@@ -73,7 +73,7 @@ if [ ! -f "$CLAUDE" ]; then
     act "新建   CLAUDE.md            (层: $LAYERS)"
     [ "$DRY" -eq 0 ] && cp "$BLOCK" "$CLAUDE" || true
 elif grep -qF "$BEGIN_MARK" "$CLAUDE"; then
-    act "刷新   CLAUDE.md            (托管块已替换, 层: $LAYERS)"
+    act "刷新   CLAUDE.md            (标记之间那段已换掉, 层: $LAYERS)"
     if [ "$DRY" -eq 0 ]; then
         awk -v b="$BEGIN_MARK" -v e="$END_MARK" -v f="$BLOCK" '
             index($0, b) { skip = 1; while ((getline l < f) > 0) print l; close(f); next }
@@ -86,7 +86,7 @@ else
     [ "$DRY" -eq 0 ] && { printf '\n'; cat "$BLOCK"; } >> "$CLAUDE" || true
 fi
 
-# --- 2. 三份台账 + 任务骨架 --------------------------------------------------
+# --- 2. 三份记录文件 + 任务骨架 ----------------------------------------------
 place() {  # $1=源文件  $2=目标路径  $3=权限
     local src=$1 dst=$2 mode=${3:-644} rel=${2#"$TARGET"/}
     if [ -e "$dst" ] && [ "$FORCE" -eq 0 ]; then
@@ -121,4 +121,4 @@ fi
 echo
 echo "完成 —— 目标: $TARGET"
 [ "$DRY" -eq 1 ] && echo "(预览模式: 什么都没写)" || true
-echo "下一步: 在看到任何结果之前, 先把 docs/PROVENANCE.md 的判据填掉。"
+echo "下一步: 在看到任何结果之前, 先把 docs/PROVENANCE.md 的判断标准填掉。"
