@@ -16,15 +16,15 @@
 ## 快速开始
 
 ```bash
-git clone https://github.com/hashiruu/agent-workflow-template.git
-cd agent-workflow-template
+git clone https://github.com/hashiruu/agent-research-workflow.git
+cd agent-research-workflow
 ./install.sh                 # 装到 ~/.claude/skills/agent-workflow
 ```
 
 不想克隆：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/main/install.sh | bash
 ```
 
 装完重启 Claude Code。skill 在会话启动时才会被加载，不重启看不见。
@@ -184,7 +184,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那四份
 
 ```bash
 cd ~/我的项目
-bash ~/克隆下来的/agent-workflow-template/install.sh --project
+bash ~/克隆下来的/agent-research-workflow/install.sh --project
 ```
 
 `--dir 路径` 则装到你指定的任意位置。

@@ -22,15 +22,15 @@ decision points.
 ## Quick start
 
 ```bash
-git clone https://github.com/hashiruu/agent-workflow-template.git
-cd agent-workflow-template
+git clone https://github.com/hashiruu/agent-research-workflow.git
+cd agent-research-workflow
 ./install.sh                 # -> ~/.claude/skills/agent-workflow
 ```
 
 Without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/main/install.sh | bash
 ```
 
 Restart Claude Code afterwards. Skills are loaded at session start, so you will
@@ -206,7 +206,7 @@ by absolute path:
 
 ```bash
 cd ~/my-project
-bash ~/where-you-cloned/agent-workflow-template/install.sh --project
+bash ~/where-you-cloned/agent-research-workflow/install.sh --project
 ```
 
 `--dir PATH` installs wherever you point it.

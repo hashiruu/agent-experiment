@@ -7,11 +7,11 @@
 #   ./install.sh --dir 路径   -> 路径/agent-workflow
 #
 # 从克隆下来的仓库里能跑, 直接单独拉这个脚本也能跑:
-#   curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/main/install.sh | bash
 # =============================================================================
 set -euo pipefail
 
-REPO_URL="https://github.com/hashiruu/agent-workflow-template.git"
+REPO_URL="https://github.com/hashiruu/agent-research-workflow.git"
 SKILL_NAME="agent-workflow"
 DEST_ROOT="$HOME/.claude/skills"
 TMP=""
