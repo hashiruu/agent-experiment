@@ -284,41 +284,49 @@ bash ~/where-you-cloned/agent-experiment/install.sh --project
 
 `--dir PATH` installs wherever you point it.
 
-## In practice
+## In practice: the more GPUs, the better it pays
 
 Queue never idle, resume from checkpoint, land every result the moment it exists.
 **Measured at roughly 25x**: seven days covered close to what half a year used to.
 
-Running unattended is the easy half. The hard part is trusting the results
-afterwards: the completion marker that turned out to be last round's, two chains
-writing into one directory, the table you updated while the prose still quotes
-the old number. Running unattended only makes those happen faster. The rules
-below exist to plug exactly those holes, and every one of them cost a real
-incident:
+**Your job is to write the experiments you want into `docs/TODO.md`.** It takes it
+from there: work out which card is actually free, spread the queue across them, and
+start the next one the moment something finishes. While you sleep, teach or sit in
+a meeting, the machines are not idling waiting for you to type. The more cards you
+have, the bigger the gap: four cards means four chains running at once, and all you
+do is glance at the queue every few hours.
 
-- One OOM no longer destroys the whole chain. Staged artifacts plus per-pass
-  switches mean a failure in the last step reruns only that step, and the cost
-  drops from tens of hours to minutes. (L2 rule 15)
-- No more "all done" read off a stale marker. The completion marker is written
-  only after every subtask succeeds, and monitoring accepts it only if its mtime
-  is later than launch. A leftover marker from a failed batch really did fool the
-  monitor once. (L1 rule 2)
-- No two chains colliding in one output directory. Check the queue before
-  launching, not just the process list: a scheduler blocked in a wait loop looks
-  like nothing is running. (L1 rule 3)
-- Updating a table never leaves the prose behind. After a rerun replaces the
-  numbers, grep the whole document for every old value. That time the headline
-  claim had shrunk a lot, and copying the old sentence would have overstated it.
-  (L1 rule 5)
-- Pushes do not fail silently. Assert local equals remote after every push. That
-  assertion exists because a push really did fail silently. (L3 rule 20)
-- LaTeX edits are always compiled. One edit dropped a `figure` inside another
-  table's body. Bracket matching, environment closure, reference definitions,
-  column counts, every static check passed, and the document was still broken.
-  Only a real compile caught it. (L3 rule 21)
-- Wrong conclusions are kept and retracted, not erased. A judgement made on 6
-  samples killed a run that was configured correctly, and the retraction is still
-  sitting there. (L1 rules 6 and 11)
+Running several chains at once is not hard because starting a job is hard. It is
+hard because **the chains step on each other**. What you no longer have to watch:
+
+- **Is that card really free?** `CUDA_VISIBLE_DEVICES` indices lie, and an
+  `nvidia-smi` error does not mean the card is broken. Read it wrong once and you
+  schedule onto a card that is already full, and both jobs OOM. (L2 rules 12 and 13)
+- **Will it collide with itself?** Check the queue before launching, not just the
+  process list: a scheduler sitting in a wait loop looks like nothing is running
+  when it is about to start the same chain. (L1 rule 3)
+- **If it collides, does data die?** One directory per run, relative paths only, so
+  two chains never write the same file and no row of your table ends up from a
+  different source than the rest. (L2 rule 14)
+- **How much has to be rerun after a crash?** Staged artifacts, so only the step
+  that died runs again. An OOM in the last step costs minutes, not tens of hours.
+  (L2 rule 15)
+- **Can it pretend it finished?** The completion marker is written only after
+  everything succeeds, and monitoring accepts only markers from this round. A
+  leftover marker from a failed batch really did fool the monitor once. (L1 rule 2)
+
+The same holds for the paper and the repo, so what you come back to can be trusted:
+
+- After a rerun replaces the numbers, every old value gets grepped out of the whole
+  document, so the table never disagrees with the prose. (L1 rule 5)
+- Every push is followed by an assertion that local equals remote, added because a
+  push really did fail silently. (L3 rule 20)
+- LaTeX is always compiled. One edit dropped a `figure` into another table's body,
+  every static check passed, and the document was still broken. (L3 rule 21)
+
+One honest note: the template ships no scheduler daemon. **The agent does the
+scheduling**; these rules are what make parallel runs safe to attempt and quiet
+failures impossible to miss.
 
 ## Design principles
 
