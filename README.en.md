@@ -7,20 +7,14 @@
 [简体中文](README.md) · English
 
 > [!WARNING]
-> **This automates execution, not judgement.** A human has to be present for the
-> decisions that matter: whether a batch of results can be trusted, whether
-> something gets pushed to a public repo, whether a number in the paper changes.
-> The rules keep an agent from failing silently. They do not decide for you.
->
-> On a key decision it stops and waits for you, parks that item in the blocked
-> section of `docs/TODO.md`, and moves on to work that does not depend on it. It
-> never idles, but that one item stays stuck until you come back.
->
-> **Review `docs/TODO.md` at least every 4 hours** (`/loop` can do the reminding, see [Monitoring a long run](#monitoring-a-long-run)). Check that the queue is
-> moving, that blocked items have an owner, and that nothing appeared on it
-> without your knowing. The longer it runs unattended, the more unreviewed output
-> piles up: catching a wrong direction after 4 hours costs one rerun, catching it
-> after two days costs two days.
+> **This automates execution, not judgement.** On a decision that matters - whether
+> a batch of results can be trusted, whether something gets pushed to a public
+> repo, whether a number in the paper changes - it stops and waits for you, parks
+> the item in the blocked section of `docs/TODO.md`, and moves on to work that does
+> not depend on it. So it never idles, but that one item stays stuck until you come
+> back. **Review `docs/TODO.md` at least every 4 hours** (`/loop` can do the
+> reminding, see [Monitoring a long run](#monitoring-a-long-run)): catching a wrong
+> direction after 4 hours costs one rerun, catching it after two days costs two days.
 
 > A research automation workflow that runs 24/7: it runs your experiments,
 > maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
@@ -37,32 +31,37 @@ stretch, and every rule in here has a real incident behind it.
 
 ```mermaid
 flowchart TB
-    subgraph LOOP["the loop the agent runs 24/7 in your project"]
-        direction LR
+    subgraph LOOP["Agent, 24/7 loop"]
+        direction TB
         T1["take the next item<br/>docs/TODO.md"]
         D{"key decision?"}
         T2["start the task<br/>run_task.sh · resumes"]
         T3["watch for crashes<br/>docs/monitoring.md"]
-        T4["leave evidence<br/>docs/PROVENANCE.md"]
-        T5["log the incident<br/>docs/RULES.md"]
-        T6["update the queue<br/>docs/TODO.md"]
+        PV["leave evidence<br/>docs/PROVENANCE.md"]
+        RL["log the incident<br/>docs/RULES.md"]
+        TD["update the queue<br/>docs/TODO.md"]
         T1 --> D
         D -->|"no · proceed on its own"| T2
-        T2 --> T3 --> T4 --> T5 --> T6
-        T6 --> T1
+        T2 --> T3
+        T3 --> PV
+        T3 --> RL
+        T3 --> TD
+        PV --> T1
+        RL --> T1
+        TD --> T1
     end
 
     D -->|"yes · stop and wait for you"| W["park it in TODO blocked<br/>state who and what it waits on"]
     W -->|"meanwhile take an item that does not depend on it"| T1
-    W -.-> HU
+    W -.->|"this one is stuck"| HU
     HU(["you"]) -.->|"decision made · back on the queue"| T1
-    HU ==>|"review the queue every 4h"| T6
+    TD ==>|"review the queue every 4h"| HU
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,T3,T4,T5,T6 step
+    class T1,T2,T3,PV,RL,TD step
     class D gate
     class W side
     class HU human

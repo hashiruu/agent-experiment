@@ -7,16 +7,11 @@
 简体中文 · [English](README.en.md)
 
 > [!WARNING]
-> **这套东西自动化的是执行，不是判断。** 关键决策必须有人在场：这批结果能不能采信、
-> 要不要推到公开仓库、论文里的数字该不该改。规则能让 agent 少犯静默错误，
-> 不能替你做决定。
->
-> 碰到关键决策它会停下来等待用户决策，把这件事挂进 `docs/TODO.md` 的阻塞区，
-> 同时继续推进不依赖这个决策的任务——它不会干等着，但那一件会一直卡到你回来。
->
-> **建议至少每 4 小时过一遍 `docs/TODO.md`**（可以用 `/loop` 定时提醒，见[监控长任务](#监控长任务)）：确认队列在往前走、阻塞项有人管、
-> 没有冒出你不知道的新任务。挂机跑得越久，无人复核的产出越容易攒成一次性的大返工——
-> 4 小时发现方向错了是重跑一轮，两天后发现是重跑两天。
+> **它自动化的是执行，不是判断。** 碰到关键决策——这批结果能不能采信、要不要推到公开仓库、
+> 论文里的数字该不该改——它会停下来等你，把这件事挂进 `docs/TODO.md` 的阻塞区，同时继续推进
+> 不依赖它的任务，所以它不会干等着，但那一件会一直卡到你回来。**建议至少每 4 小时过一遍
+> `docs/TODO.md`**（可以用 `/loop` 定时提醒，见[监控长任务](#监控长任务)）：4 小时发现方向错了
+> 是重跑一轮，两天后发现是重跑两天。
 
 > 一个 7 × 24 小时不间断运行，帮你跑实验、用 Git 维护公开仓库、更新 LaTeX（Overleaf）论文的科研自动化工作流。
 
@@ -27,32 +22,37 @@
 
 ```mermaid
 flowchart TB
-    subgraph LOOP["Agent 在你项目里 7×24 转的循环"]
-        direction LR
+    subgraph LOOP["Agent 7×24 循环"]
+        direction TB
         T1["取下一件事<br/>docs/TODO.md"]
         D{"关键决策?"}
         T2["起任务<br/>run_task.sh · 中断能接着跑"]
         T3["盯崩溃<br/>docs/monitoring.md"]
-        T4["留证据<br/>docs/PROVENANCE.md"]
-        T5["踩坑回写<br/>docs/RULES.md"]
-        T6["更新队列<br/>docs/TODO.md"]
+        PV["留证据<br/>docs/PROVENANCE.md"]
+        RL["踩坑回写<br/>docs/RULES.md"]
+        TD["更新队列<br/>docs/TODO.md"]
         T1 --> D
         D -->|"否 · 自行推进"| T2
-        T2 --> T3 --> T4 --> T5 --> T6
-        T6 --> T1
+        T2 --> T3
+        T3 --> PV
+        T3 --> RL
+        T3 --> TD
+        PV --> T1
+        RL --> T1
+        TD --> T1
     end
 
     D -->|"是 · 停下等待用户决策"| W["挂进 TODO 阻塞区<br/>写清在等谁的什么"]
     W -->|"同时去做不依赖它的下一件事"| T1
-    W -.-> HU
+    W -.->|"这件事卡住了"| HU
     HU(["你"]) -.->|"决策给出 · 入队"| T1
-    HU ==>|"每 4 小时复核队列"| T6
+    TD ==>|"每 4 小时复核队列"| HU
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,T3,T4,T5,T6 step
+    class T1,T2,T3,PV,RL,TD step
     class D gate
     class W side
     class HU human
