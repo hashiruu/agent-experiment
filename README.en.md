@@ -397,15 +397,6 @@ gets pushed at 3am is how you launch your agent and what you granted it, not thi
 template. If you do not want it near Git, do not install L3: `--layers l1` or
 `--layers l1,l2`.
 
-## Notes
-
-The rules are in Chinese. They were recorded in the language the incidents
-happened in, and translating them costs the precision that makes them usable.
-
-Dataset names and metric values in the rule examples have been replaced with
-stand-ins. The incidents and their magnitude are real, but the specific numbers
-are not the source project's results, so do not quote them.
-
 ## Layout
 
 ```
