@@ -17,27 +17,9 @@ task script that resumes after an interruption land in place. The rules come out
 of the work behind a real top-tier conference paper: a project that ran unattended
 for a long stretch, and every rule in here has a real incident behind it.
 
-**What it is good for:**
+**Use it for**: automated workflows · SOTA baselines side by side · repeated runs across seeds and configs.
 
-- **Automated workflows**: one chain running for tens of hours, resuming where it
-  stopped, with nobody sitting at the terminal
-- **SOTA experiments**: several baselines running side by side, where every number
-  can be traced back to where it came from
-- **Repetitive runs across seeds and configs**: write them into the queue once, and
-  whichever card frees up picks up the next one
-
-**You do not have to take my word for it:**
-
-- **Every push runs end to end** — install the skill, deploy it, run a real task, then
-  make it fail on purpose and check that a failure never writes a completion marker.
-  A green badge means it still holds right now; click it to read every step's output.
-- **One real run is kept in the repo** — [`examples/run-ci-demo/`](examples/) holds the
-  log, the completion marker, the code snapshot, the weights and the metric, produced
-  by that CI run rather than typed by hand.
-- **All 26 rules are there to read** — each with the incident that produced it, in
-  [`assets/CLAUDE.md`](skills/agent-experiment/assets/CLAUDE.md).
-- **You can see what it would write before it writes** — `deploy.sh --dry-run` touches
-  nothing.
+**Check it yourself**: [CI runs end to end on every push](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml) · [artifacts from a real run](examples/) · [all 26 rules](skills/agent-experiment/assets/CLAUDE.md) · `deploy.sh --dry-run` before anything is written.
 
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops
