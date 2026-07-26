@@ -128,7 +128,8 @@ Rules are tagged by scope, so a frontend project does not inherit GPU advice.
 
 **Numbering is global 1-26, not per layer**: L1 is rules 1-11, L2 is 12-19, L3 is
 20-26. So "L3 rule 21" means global rule 21, not the 21st rule of L3 (L3 only has
-7). Numbers do not shift when a layer is dropped, so cross-references never break.
+7). Numbers do not shift when a layer is dropped, so cross-references never break. If you
+do not want it near Git, do not install L3.
 
 | Layer | Rules | Keep it when | One example |
 |---|---|---|---|
@@ -323,6 +324,9 @@ bash ~/where-you-cloned/agent-experiment/install.sh --project
 ```
 
 `--dir PATH` installs wherever you point it.
+To update: `git pull`, then re-run `./install.sh` (it replaces the whole skill
+directory, so back up first if you edited `assets/`). To uninstall: delete
+`~/.claude/skills/agent-experiment`; files already deployed into a project are yours.
 
 ## In practice: the more GPUs, the better it pays
 
@@ -369,64 +373,6 @@ configured correctly. Keeping that retraction is worth more than a clean rewrite
   $START`). Editing those two lines is the simplest fix. Homebrew coreutils works
   too, but it installs them as `gstat` / `gdate`, so `gnubin` has to be on your
   PATH before `stat -c` resolves. Windows: use WSL.
-
-## FAQ
-
-**I already have a `CLAUDE.md`. Will it be overwritten?**
-No. The block is appended below your content, and later runs replace only that
-block. What you wrote is never touched.
-
-**Can I install L1 only and add layers later?**
-Yes. `--layers l1` installs 11 rules; change the flag and re-run to add more, and
-the block refreshes in place. Rule numbers are identical in every combination, so
-cross-references never break.
-
-**I have half-filled records. Will a re-run wipe them?**
-No. The five files under `docs/` and `scripts/` are never overwritten once they
-exist, unless you pass `--force` yourself.
-
-**Can I use this without Claude Code?**
-Yes, see [With Codex, Gemini CLI or any other agent](#with-codex-gemini-cli-or-any-other-agent) above.
-
-**How do I update?**
-`git pull`, then re-run `./install.sh`, which **replaces the whole skill
-directory** - back up first if you edited the rules under
-`~/.claude/skills/agent-experiment/assets/`.
-Projects you already deployed into are unaffected; re-run `deploy.sh` there if you
-want the newer rules.
-
-**How do I uninstall?**
-`rm -rf ~/.claude/skills/agent-experiment`, or `./.claude/skills/agent-experiment` if
-you installed with `--project`. Files already deployed into a project are your
-records, so keep or delete them as you like. Removing every trace takes two
-edits: in `CLAUDE.md`, delete everything between `<!-- agent-experiment:begin ... -->`
-and `<!-- agent-experiment:end -->`, markers included; in `.gitignore`, delete the
-block starting at `# --- agent-experiment ---` (that line is also how the script
-knows it already appended).
-
-**I installed with `--project`. What path do the commands use?**
-Replace every `~/.claude/skills/agent-experiment/` below with
-`./.claude/skills/agent-experiment/`.
-
-**I do not trust `curl | bash`.**
-You should not. Split it: `curl -fsSL <url> -o install.sh`, read it, then
-`bash install.sh`. The script does three things: copy `skills/agent-experiment/`
-into your skills directory, `chmod +x`, and verify nothing is missing. The script
-that writes into your project is `deploy.sh`, and it has `--dry-run`.
-
-**Will it push on its own, or edit my code?**
-Two separate layers, do not conflate them. **The template itself will not.**
-`deploy.sh` writes seven files into your project (one of which appends a block to
-`.gitignore`), touches no git config, goes nowhere online, and asks for no
-permissions. The only network call is `install.sh` cloning this repo on the
-`curl | bash` path, and `run_task.sh` runs nothing until you put your own
-commands in it.
-
-**But the seven L3 rules are precisely about teaching an agent to push**, which
-is their purpose, not a side effect. So what actually decides whether something
-gets pushed at 3am is how you launch your agent and what you granted it, not this
-template. If you do not want it near Git, do not install L3: `--layers l1` or
-`--layers l1,l2`.
 
 ## Layout
 

@@ -109,7 +109,7 @@ $ bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
 
 **编号是全局的 1–26，不是层内编号**：L1 是第 1–11 条，L2 是第 12–19 条，L3 是第 20–26 条。
 所以"L3 第 21 条"指的是全局第 21 条，不是 L3 里的第 21 条（L3 一共才 7 条）。
-丢掉某一层时编号不变，交叉引用不会错位。
+丢掉某一层时编号不变，交叉引用不会错位。不想让它碰 Git 就别装 L3。
 
 | 层 | 条数 | 什么时候留 | 举一条 |
 |---|---|---|---|
@@ -279,6 +279,8 @@ bash ~/克隆下来的/agent-experiment/install.sh --project
 ```
 
 `--dir 路径` 则装到你指定的任意位置。
+更新：`git pull` 后重跑 `./install.sh`（整个替换 skill 目录，改过 `assets/` 就先备份）。
+卸载：删掉 `~/.claude/skills/agent-experiment` 即可，项目里已部署的文件是你的记录。
 
 ## 实战：卡越多，越划算
 
@@ -313,49 +315,6 @@ bash ~/克隆下来的/agent-experiment/install.sh --project
   `assert_fresh()` 里的 `stat -c %Y`（BSD 上是 `stat -f %m`），和完成标记那行的 `date -d @$START`
   （BSD 上是 `date -r $START`）。macOS 改这两行即可；装 Homebrew 的 coreutils 也行，
   但它默认把命令装成 `gstat` / `gdate`，得把 `gnubin` 加进 PATH 才认 `stat -c`。Windows 走 WSL。
-
-## FAQ
-
-**项目里已经有 `CLAUDE.md`，会被覆盖吗？**
-不会。新内容加在你已有内容的下面，用一对注释标记夹起来；以后重跑只重写这两行标记之间的部分，你写的一直不动。
-
-**能只装 L1 吗？装完还能再加层吗？**
-能。`--layers l1` 只装 11 条；之后想加，改参数重跑就行，标记之间那段会原地换掉。
-规则编号在任何组合下都不变，交叉引用不会错位。
-
-**记录写了一半，重跑会被清空吗？**
-不会。`docs/` 和 `scripts/` 下那五份文件一旦存在就永不覆盖，除非你自己加 `--force`。
-
-**不用 Claude Code 能用吗？**
-能，见上面[用 Codex、Gemini CLI 或别的 agent](#用-codexgemini-cli-或别的-agent)。
-
-**怎么更新到新版本？**
-`git pull` 之后重跑 `./install.sh`，它会**整个替换掉**旧的 skill 目录——
-你要是改过 `~/.claude/skills/agent-experiment/assets/` 里的规则，先备份。
-项目里已经部署的内容不受影响，想同步规则就在项目里重跑一次 `deploy.sh`。
-
-**怎么卸载？**
-`rm -rf ~/.claude/skills/agent-experiment`。用 `--project` 装的就删 `./.claude/skills/agent-experiment`。
-项目里已经部署的文件是你的记录，删不删随你。想彻底去掉痕迹有两处：
-`CLAUDE.md` 里 `<!-- agent-experiment:begin ... -->` 到 `<!-- agent-experiment:end -->` 之间那段（连标记一起删），
-以及 `.gitignore` 末尾 `# --- agent-experiment ---` 那行往下的一段（脚本也是靠这行判断"已经追加过"的）。
-
-**用 `--project` 装的，命令路径怎么写？**
-把下文所有 `~/.claude/skills/agent-experiment/` 换成 `./.claude/skills/agent-experiment/`。
-
-**`curl | bash` 我不放心。**
-应该的。想先审就分两步：`curl -fsSL <url> -o install.sh`，看完再 `bash install.sh`。
-脚本干的事就三件：把 `skills/agent-experiment/` 拷到 skills 目录、`chmod +x`、校验文件齐不齐。
-真正会往你项目里写文件的是 `deploy.sh`，它有 `--dry-run`，写之前先看一眼。
-
-**它会不会自己 push、自己改我的代码？**
-分两层说，别混。**模板自己不会**：`deploy.sh` 只往你项目里写 7 个文件（其中会往 `.gitignore`
-末尾追加一段），不改 git 配置、不联网、不申请任何权限；唯一联网的是 `install.sh` 走
-`curl | bash` 时克隆本仓库；`run_task.sh` 要你自己往里填命令才会跑东西。
-
-**但 L3 那七条本来就是教 agent 怎么推仓库的**，这是它的用途，不是副作用。所以真正决定
-"半夜会不会有东西被推上去"的，是你怎么起 agent、给了它什么权限，不是这份模板。
-不想让它碰 Git 就别装 L3：`--layers l1` 或 `--layers l1,l2`。
 
 ## 目录结构
 
