@@ -21,6 +21,33 @@
 一个中断能接着跑的任务脚本就会自动落到位。规则不是编的——它们来自一篇真实产出的顶会论文，
 那个项目长期无人值守地跑，这些规则是一条条踩出来的。
 
+## 它是怎么转起来的
+
+规则不是拷进去就完事。它约束执行，执行留下证据，出了事故再回写成新规则，而人只在决策点出现：
+
+```mermaid
+flowchart TB
+    LIB["26 条规则<br/>L1 通用 11 · L2 计算实验 8 · L3 论文写作 7"] --> DEP
+    SK["skill 入口<br/>/agent-workflow"] --> DEP["deploy.sh<br/>按需选层 · 可重复跑 · 不覆盖你写的东西"]
+
+    DEP --> CM["CLAUDE.md<br/>agent 开工前读的规则"]
+    DEP --> TD["docs/TODO.md<br/>还剩什么 · 什么卡住 · 什么砍了"]
+    DEP --> RL["docs/RULES.md<br/>这个项目自己踩过的坑"]
+    DEP --> PV["docs/PROVENANCE.md<br/>每个数字 → 权重 代码 日志"]
+    DEP --> RT["scripts/run_task.sh<br/>中断能接着跑 · 失败不假装成功"]
+
+    CM --> AG(["Agent 7×24 跑"])
+    TD --> AG
+    AG --> RT
+    RT -->|"成功才写完成标记<br/>失败写 FAILED"| AG
+    AG -->|"踩坑当场回写"| RL
+    AG -->|"每个对外数字留证据"| PV
+    AG -->|"做完就勾掉"| TD
+    RL -->|"同样的坑不踩第二次"| CM
+    HU(["你"]) -->|"每 4 小时复核队列"| TD
+    PV -->|"可核对的结果"| HU
+```
+
 ## 快速开始
 
 ```bash

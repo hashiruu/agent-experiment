@@ -28,6 +28,35 @@ resumes after an interruption land in place. The rules were not invented. They
 come out of the work behind a real top-tier conference paper, produced by a
 project that ran unattended for a long stretch, one incident at a time.
 
+## How it works
+
+Copying the rules in is not the point. They constrain execution, execution leaves
+evidence, incidents get written back as new rules, and a human shows up only at
+the decision points:
+
+```mermaid
+flowchart TB
+    LIB["26 rules<br/>L1 general 11 · L2 compute 8 · L3 writing 7"] --> DEP
+    SK["skill entry<br/>/agent-workflow"] --> DEP["deploy.sh<br/>pick layers · safe to re-run · never clobbers your text"]
+
+    DEP --> CM["CLAUDE.md<br/>what the agent reads before starting"]
+    DEP --> TD["docs/TODO.md<br/>left to do · blocked · dropped"]
+    DEP --> RL["docs/RULES.md<br/>what went wrong in this project"]
+    DEP --> PV["docs/PROVENANCE.md<br/>each number → weights code logs"]
+    DEP --> RT["scripts/run_task.sh<br/>resumes · never fakes success"]
+
+    CM --> AG(["Agent, running 24/7"])
+    TD --> AG
+    AG --> RT
+    RT -->|"marker only on success<br/>FAILED on failure"| AG
+    AG -->|"log the incident as it happens"| RL
+    AG -->|"evidence for every number"| PV
+    AG -->|"tick it off when done"| TD
+    RL -->|"never hit the same one twice"| CM
+    HU(["You"]) -->|"review the queue every 4h"| TD
+    PV -->|"results you can check"| HU
+```
+
 ## Quick start
 
 ```bash
