@@ -12,8 +12,8 @@
 
 Install the skill once, run one deploy command inside your project, and 26 rules of
 long-horizon working discipline, three record files, a monitoring guide and a task
-script that survives an interruption are deployed for you. The rules come from a formally
-presented top-tier conference paper whose experiments ran unattended and repeatedly.
+script that survives an interruption are deployed for you. The rules come from the real
+production of a top-tier conference paper whose experiments ran unattended and repeatedly.
 Each rule was corrected by hand after a real incident.
 
 **Use it for**: automated workflows · SOTA baselines side by side · repeated runs across seeds and configs.
