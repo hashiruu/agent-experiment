@@ -16,7 +16,7 @@
 > section of `docs/TODO.md`, and moves on to work that does not depend on it. It
 > never idles, but that one item stays stuck until you come back.
 >
-> **Review `docs/TODO.md` at least every 4 hours.** Check that the queue is
+> **Review `docs/TODO.md` at least every 4 hours** (`/loop` can do the reminding, see [Monitoring a long run](#monitoring-a-long-run)). Check that the queue is
 > moving, that blocked items have an owner, and that nothing appeared on it
 > without your knowing. The longer it runs unattended, the more unreviewed output
 > piles up: catching a wrong direction after 4 hours costs one rerun, catching it
@@ -240,6 +240,19 @@ exactly like "still running".
 The other four (event dedup, re-arming after a trigger, staggered thresholds,
 poll intervals) are in
 [`docs/monitoring.md`](skills/agent-workflow/assets/practices/monitoring.md).
+
+### Let Claude Code do the checking on a timer
+
+That "review every 4 hours" can be handed to `/loop`, which re-runs one prompt at
+a fixed interval:
+
+```
+/loop 4h read docs/TODO.md and docs/RULES.md, report where the queue stands, which blocked items are waiting on my decision, and what new incidents were logged; anything that can move without my decision, just do it
+```
+
+Intervals take `m` / `h` / `d` (`4h` means every four hours). Two things worth
+knowing: a recurring task **expires after 7 days**, so re-arm it on longer
+projects, and it only brings the state to you. The key decisions are still yours.
 
 ## Using run_task.sh
 
