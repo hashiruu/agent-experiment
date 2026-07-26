@@ -1,6 +1,6 @@
 ---
 name: agent-experiment
-description: 用于给 7×24 小时不间断运行的科研自动化项目装上工作纪律：常驻实验队列、无人值守批处理、用 Git 维护的公开仓库、持续更新的 LaTeX/Overleaf 论文。用户说"装工作流""设置长任务纪律""加任务记录""setup the workflow"时用；长时间运行中出了事故、教训要当场记下来时也用。部署 CLAUDE.md 规则、三份记录文件（RULES / TODO / PROVENANCE）和可断点续跑的任务骨架。Use when setting up a 24/7 unattended research automation project - long-running experiment queues, Git-maintained public repos, continuously updated LaTeX/Overleaf papers.
+description: 用于给 7×24 小时不间断运行的科研自动化项目装上工作纪律：常驻实验队列、半自动批处理、用 Git 维护的公开仓库、持续更新的 LaTeX/Overleaf 论文。用户说"装工作流""设置长任务纪律""加任务记录""setup the workflow"时用；长时间运行中出了事故、教训要当场记下来时也用。部署 CLAUDE.md 规则、三份记录文件（RULES / TODO / PROVENANCE）和可断点续跑的任务骨架。Use when setting up a 24/7 semi-automated research automation project - long-running experiment queues, Git-maintained public repos, continuously updated LaTeX/Overleaf papers.
 ---
 
 # 长任务工作纪律
@@ -8,7 +8,7 @@ description: 用于给 7×24 小时不间断运行的科研自动化项目装上
 给三件事同时在转的项目用：实验在跑，仓库在推，论文在改，人只在决策点出现。
 这种项目最贵的失败不是代码写错，是记错账。出事时没人在场，等发现已经很晚。
 
-素材来自一个长期无人值守的真实项目。那里攒下约 800 行规则，26 条换个项目照样成立。
+素材来自一个长期半自动运行的真实项目。那里攒下约 800 行规则，26 条换个项目照样成立。
 这个 skill 部署的就是这 26 条，外加一套让它们真被执行的脚手架。
 
 规则正文是中文。事故是中文记的，翻译会丢掉那点让规则管用的精确度。
