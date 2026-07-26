@@ -6,6 +6,18 @@
 
 [简体中文](README.md) · English
 
+> [!WARNING]
+> **This automates execution, not judgement.** A human has to be present for the
+> decisions that matter: whether a batch of results can be trusted, whether
+> something gets pushed to a public repo, whether a number in the paper changes.
+> The rules keep an agent from failing silently. They do not decide for you.
+>
+> **Review `docs/TODO.md` at least every 4 hours.** Check that the queue is
+> moving, that blocked items have an owner, and that nothing appeared on it
+> without your knowing. The longer it runs unattended, the more unreviewed output
+> piles up: catching a wrong direction after 4 hours costs one rerun, catching it
+> after two days costs two days.
+
 > A research automation workflow that runs 24/7: it runs your experiments,
 > maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
 > up to date.
