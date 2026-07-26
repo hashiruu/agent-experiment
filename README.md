@@ -9,7 +9,10 @@
 > [!WARNING]
 > **这套东西自动化的是执行，不是判断。** 关键决策必须有人在场：这批结果能不能采信、
 > 要不要推到公开仓库、论文里的数字该不该改。规则能让 agent 少犯静默错误，
-> 不能替你拍板。
+> 不能替你做决定。
+>
+> 碰到关键决策它会停下来等待用户决策，把这件事挂进 `docs/TODO.md` 的阻塞区，
+> 同时继续推进不依赖这个决策的任务——它不会干等着，但那一件会一直卡到你回来。
 >
 > **建议至少每 4 小时过一遍 `docs/TODO.md`**：确认队列在往前走、阻塞项有人管、
 > 没有冒出你不知道的新任务。挂机跑得越久，无人复核的产出越容易攒成一次性的大返工——
@@ -24,54 +27,36 @@
 
 ```mermaid
 flowchart TB
-    subgraph SETUP["① 装一次"]
+    subgraph LOOP["Agent 在你项目里 7×24 转的循环"]
         direction LR
-        SK["skill 入口<br/>/agent-workflow"]
-        LIB["26 条规则<br/>L1 通用 11 · L2 计算实验 8 · L3 论文写作 7"]
-        DEP["deploy.sh<br/>按需选层 · 可重复跑 · 不覆盖你写的东西"]
-        SK --> DEP
-        LIB --> DEP
+        T1["取下一件事<br/>docs/TODO.md"]
+        D{"关键决策?"}
+        T2["起任务<br/>run_task.sh · 中断能接着跑"]
+        T3["盯崩溃<br/>docs/monitoring.md"]
+        T4["留证据<br/>docs/PROVENANCE.md"]
+        T5["踩坑回写<br/>docs/RULES.md"]
+        T6["更新队列<br/>docs/TODO.md"]
+        T1 --> D
+        D -->|"否 · 自行推进"| T2
+        T2 --> T3 --> T4 --> T5 --> T6
+        T6 --> T1
     end
 
-    subgraph PROJ["② 落进你的项目"]
-        direction LR
-        RL["docs/RULES.md<br/>这个项目自己踩过的坑"]
-        MO["docs/monitoring.md<br/>怎么发现静默失败"]
-        TD["docs/TODO.md<br/>还剩什么 · 什么卡住 · 什么砍了"]
-        PV["docs/PROVENANCE.md<br/>每个数字 → 权重 代码 日志"]
-        RT["scripts/run_task.sh<br/>中断能接着跑 · 失败不假装成功"]
-    end
+    D -->|"是 · 停下等待用户决策"| W["挂进 TODO 阻塞区<br/>写清在等谁的什么"]
+    W -->|"同时去做不依赖它的下一件事"| T1
+    W -.-> HU
+    HU(["你"]) -.->|"决策给出 · 入队"| T1
+    HU ==>|"每 4 小时复核队列"| T6
 
-    DEP --> RL
-    DEP --> MO
-    DEP --> TD
-    DEP --> PV
-    DEP --> RT
-    DEP -->|"26 条规则进上下文"| AG
-
-    AG(["③ Agent 7×24 跑"])
-    RL -->|"同样的坑不踩第二次"| AG
-    MO -->|"崩了要能被看见"| AG
-    TD -->|"下一件事做什么"| AG
-    AG --> RT
-    RT -->|"成功才写完成标记<br/>失败写 FAILED"| AG
-
-    AG -.->|"踩坑当场回写"| RL
-    AG -.->|"每个对外数字留证据"| PV
-    AG -.->|"做完就勾掉"| TD
-
-    HU(["④ 你"])
-    HU ==>|"每 4 小时复核队列"| TD
-    PV ==>|"可核对的结果"| HU
-
-    classDef setup fill:#EEF2FF,stroke:#6366F1,stroke-width:1.5px,color:#1E1B4B
-    classDef files fill:#F0FDF4,stroke:#16A34A,stroke-width:1.5px,color:#052E16
-    classDef agent fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#451A03
-    classDef human fill:#FFE4E6,stroke:#E11D48,stroke-width:2px,color:#4C0519
-    class SK,LIB,DEP setup
-    class RL,MO,TD,PV,RT files
-    class AG agent
+    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
+    classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
+    classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
+    classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
+    class T1,T2,T3,T4,T5,T6 step
+    class D gate
+    class W side
     class HU human
+    style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
 
 ## 快速开始

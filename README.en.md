@@ -12,6 +12,10 @@
 > something gets pushed to a public repo, whether a number in the paper changes.
 > The rules keep an agent from failing silently. They do not decide for you.
 >
+> On a key decision it stops and waits for you, parks that item in the blocked
+> section of `docs/TODO.md`, and moves on to work that does not depend on it. It
+> never idles, but that one item stays stuck until you come back.
+>
 > **Review `docs/TODO.md` at least every 4 hours.** Check that the queue is
 > moving, that blocked items have an owner, and that nothing appeared on it
 > without your knowing. The longer it runs unattended, the more unreviewed output
@@ -33,54 +37,36 @@ stretch, and every rule in here has a real incident behind it.
 
 ```mermaid
 flowchart TB
-    subgraph SETUP["① install once"]
+    subgraph LOOP["the loop the agent runs 24/7 in your project"]
         direction LR
-        SK["skill entry<br/>/agent-workflow"]
-        LIB["26 rules<br/>L1 general 11 · L2 compute 8 · L3 writing 7"]
-        DEP["deploy.sh<br/>pick layers · safe to re-run · never clobbers your text"]
-        SK --> DEP
-        LIB --> DEP
+        T1["take the next item<br/>docs/TODO.md"]
+        D{"key decision?"}
+        T2["start the task<br/>run_task.sh · resumes"]
+        T3["watch for crashes<br/>docs/monitoring.md"]
+        T4["leave evidence<br/>docs/PROVENANCE.md"]
+        T5["log the incident<br/>docs/RULES.md"]
+        T6["update the queue<br/>docs/TODO.md"]
+        T1 --> D
+        D -->|"no · proceed on its own"| T2
+        T2 --> T3 --> T4 --> T5 --> T6
+        T6 --> T1
     end
 
-    subgraph PROJ["② lands in your project"]
-        direction LR
-        RL["docs/RULES.md<br/>what went wrong in this project"]
-        MO["docs/monitoring.md<br/>how to catch a silent failure"]
-        TD["docs/TODO.md<br/>left to do · blocked · dropped"]
-        PV["docs/PROVENANCE.md<br/>each number → weights code logs"]
-        RT["scripts/run_task.sh<br/>resumes · never fakes success"]
-    end
+    D -->|"yes · stop and wait for you"| W["park it in TODO blocked<br/>state who and what it waits on"]
+    W -->|"meanwhile take an item that does not depend on it"| T1
+    W -.-> HU
+    HU(["you"]) -.->|"decision made · back on the queue"| T1
+    HU ==>|"review the queue every 4h"| T6
 
-    DEP --> RL
-    DEP --> MO
-    DEP --> TD
-    DEP --> PV
-    DEP --> RT
-    DEP -->|"26 rules into context"| AG
-
-    AG(["③ Agent, running 24/7"])
-    RL -->|"never hit the same one twice"| AG
-    MO -->|"a crash has to be visible"| AG
-    TD -->|"what to do next"| AG
-    AG --> RT
-    RT -->|"marker only on success<br/>FAILED on failure"| AG
-
-    AG -.->|"log the incident as it happens"| RL
-    AG -.->|"evidence for every number"| PV
-    AG -.->|"tick it off when done"| TD
-
-    HU(["④ you"])
-    HU ==>|"review the queue every 4h"| TD
-    PV ==>|"results you can check"| HU
-
-    classDef setup fill:#EEF2FF,stroke:#6366F1,stroke-width:1.5px,color:#1E1B4B
-    classDef files fill:#F0FDF4,stroke:#16A34A,stroke-width:1.5px,color:#052E16
-    classDef agent fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#451A03
-    classDef human fill:#FFE4E6,stroke:#E11D48,stroke-width:2px,color:#4C0519
-    class SK,LIB,DEP setup
-    class RL,MO,TD,PV,RT files
-    class AG agent
+    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
+    classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
+    classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
+    classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
+    class T1,T2,T3,T4,T5,T6 step
+    class D gate
+    class W side
     class HU human
+    style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
 
 ## Quick start
