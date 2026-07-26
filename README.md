@@ -81,7 +81,6 @@ $ bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
   [dry-run] 新建   docs/PROVENANCE.md
   [dry-run] 新建   docs/monitoring.md
   [dry-run] 新建   scripts/run_task.sh
-  [dry-run] 追加   .gitignore
 
 完成 —— 目标: /path/to/your/project
 (预览模式: 什么都没写)
@@ -96,7 +95,6 @@ $ bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
 | `docs/PROVENANCE.md` | 记每个对外的数字是从哪个文件算出来的，以及**动手前**就定好的判断标准 | 不会 |
 | `docs/monitoring.md` | 怎么监控一个跑几十小时的任务：静默失败的八种防法。现成的，不用填 | 不会 |
 | `scripts/run_task.sh` | 跑长任务用的脚本模板：中断了能接着跑，失败了不会假装成功 | 不会 |
-| `.gitignore` | 告诉 git 别把实验产物、日志、LaTeX 中间文件提交上去 | 只在末尾追加一次 |
 
 `docs/` 和 `scripts/` 下那五份文件一旦建成就归项目自己所有，真要覆盖得加 `--force`。
 
@@ -326,7 +324,6 @@ skills/agent-experiment/
   deploy.sh                      部署脚本，可重复跑 + 分层过滤
   assets/
     CLAUDE.md                    26 条规则，分 L1 / L2 / L3
-    gitignore.snippet
     scaffold/{RULES,TODO,PROVENANCE}.md
     scaffold/run_task.sh
     practices/monitoring.md      长任务监控：静默失败的八种防法

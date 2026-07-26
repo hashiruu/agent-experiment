@@ -11,7 +11,6 @@
 #   docs/PROVENANCE.md   数字溯源索引 + 判断标准         (永不覆盖)
 #   docs/monitoring.md   怎么监控长任务: 静默失败的八种防法 (永不覆盖)
 #   scripts/run_task.sh  可断点续跑的任务骨架            (永不覆盖)
-#   .gitignore           追加模板的忽略规则              (只追加一次)
 #
 # 可重复跑: 重跑只换 CLAUDE.md 里标记之间那一段。那四份文件建成后就归项目自己所有,
 # 真要覆盖用 --force。
@@ -107,18 +106,6 @@ place "$ASSETS/scaffold/TODO.md"       "$TARGET/docs/TODO.md"
 place "$ASSETS/scaffold/PROVENANCE.md" "$TARGET/docs/PROVENANCE.md"
 place "$ASSETS/practices/monitoring.md"  "$TARGET/docs/monitoring.md"
 place "$ASSETS/scaffold/run_task.sh"   "$TARGET/scripts/run_task.sh" 755
-
-# --- 3. .gitignore ----------------------------------------------------------
-GI="$TARGET/.gitignore"
-GI_MARK="# --- agent-experiment ---"
-if [ -f "$GI" ] && grep -qF "$GI_MARK" "$GI"; then
-    say "保留   .gitignore (agent-experiment 规则已存在)"
-else
-    act "追加   .gitignore"
-    if [ "$DRY" -eq 0 ]; then
-        { [ -f "$GI" ] && printf '\n' || true; echo "$GI_MARK"; cat "$ASSETS/gitignore.snippet"; } >> "$GI"
-    fi
-fi
 
 echo
 echo "完成 —— 目标: $TARGET"

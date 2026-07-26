@@ -52,7 +52,7 @@ cp -R "$SRC" "$DEST"
 chmod +x "$DEST/deploy.sh" "$DEST/assets/scaffold/run_task.sh"
 
 # --- 校验 --------------------------------------------------------------------
-for f in SKILL.md deploy.sh assets/CLAUDE.md assets/gitignore.snippet \
+for f in SKILL.md deploy.sh assets/CLAUDE.md \
          assets/scaffold/RULES.md assets/scaffold/TODO.md \
          assets/scaffold/PROVENANCE.md assets/scaffold/run_task.sh \
          assets/practices/monitoring.md; do

@@ -54,7 +54,6 @@ docs/TODO.md         还剩什么要做、什么卡在等别人、什么砍了�
 docs/PROVENANCE.md   每个对外数字是从哪算出来的，以及动手前定好的判断标准
 docs/monitoring.md   怎么监控跑几十小时的任务：静默失败的八种防法（现成的，不用填）
 scripts/run_task.sh  长任务脚本模板：中断能接着跑，失败不会假装成功
-.gitignore           别让实验产物、日志、LaTeX 中间文件进版本库
 ```
 
 `docs/` 和 `scripts/` 下那五份文件，一旦存在就永不覆盖，它们会变成这个项目自己的记录。

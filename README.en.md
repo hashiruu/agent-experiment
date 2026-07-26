@@ -95,7 +95,6 @@ $ bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
   [dry-run] 新建   docs/PROVENANCE.md
   [dry-run] 新建   docs/monitoring.md
   [dry-run] 新建   scripts/run_task.sh
-  [dry-run] 追加   .gitignore
 
 完成 —— 目标: /path/to/your/project
 (预览模式: 什么都没写)
@@ -112,7 +111,6 @@ The script speaks Chinese, like the rules it deploys.
 | `docs/PROVENANCE.md` | which file each published number came from, plus the criteria you fixed **before** looking | No |
 | `docs/monitoring.md` | how to monitor a run that lasts tens of hours: eight ways a failure stays silent. Ready to use, nothing to fill in | No |
 | `scripts/run_task.sh` | the script template for long runs: resumes after an interruption, never fakes success on failure | No |
-| `.gitignore` | keeps run artifacts, logs and LaTeX intermediates out of git | appended once, at the end |
 
 Once those five files under `docs/` and `scripts/` exist they belong to the
 project. Changing that takes `--force`.
@@ -384,7 +382,6 @@ skills/agent-experiment/
   deploy.sh                      deployment script, safe to re-run, layer filtering
   assets/
     CLAUDE.md                    the 26 rules, L1 / L2 / L3
-    gitignore.snippet
     scaffold/{RULES,TODO,PROVENANCE}.md
     scaffold/run_task.sh
     practices/monitoring.md      monitoring long runs: eight ways failure stays silent
