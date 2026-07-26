@@ -9,6 +9,7 @@
 #   docs/RULES.md        本项目特有的踩坑记录            (永不覆盖)
 #   docs/TODO.md         FIFO 队列 + 阻塞项 + 已取消项   (永不覆盖)
 #   docs/PROVENANCE.md   数字溯源索引 + 判断标准         (永不覆盖)
+#   docs/monitoring.md   怎么监控长任务: 静默失败的八种防法 (永不覆盖)
 #   scripts/run_task.sh  可断点续跑的任务骨架            (永不覆盖)
 #   .gitignore           追加模板的忽略规则              (只追加一次)
 #
@@ -104,6 +105,7 @@ place() {  # $1=源文件  $2=目标路径  $3=权限
 place "$ASSETS/scaffold/RULES.md"      "$TARGET/docs/RULES.md"
 place "$ASSETS/scaffold/TODO.md"       "$TARGET/docs/TODO.md"
 place "$ASSETS/scaffold/PROVENANCE.md" "$TARGET/docs/PROVENANCE.md"
+place "$ASSETS/practices/monitoring.md"  "$TARGET/docs/monitoring.md"
 place "$ASSETS/scaffold/run_task.sh"   "$TARGET/scripts/run_task.sh" 755
 
 # --- 3. .gitignore ----------------------------------------------------------

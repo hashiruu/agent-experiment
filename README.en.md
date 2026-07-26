@@ -23,7 +23,8 @@
 > up to date.
 
 Install the skill once, run one deploy command inside your project, and 26 rules
-of long-horizon working discipline, three record files and a task script that
+of long-horizon working discipline, three record files, a long-run monitoring
+guide and a task script that
 resumes after an interruption land in place. The rules come out of the work
 behind a real top-tier conference paper: a project that ran unattended for a long
 stretch, and every rule in here has a real incident behind it.
@@ -32,25 +33,54 @@ stretch, and every rule in here has a real incident behind it.
 
 ```mermaid
 flowchart TB
-    LIB["26 rules<br/>L1 general 11 · L2 compute 8 · L3 writing 7"] --> DEP
-    SK["skill entry<br/>/agent-workflow"] --> DEP["deploy.sh<br/>pick layers · safe to re-run · never clobbers your text"]
+    subgraph SETUP["① install once"]
+        direction LR
+        SK["skill entry<br/>/agent-workflow"]
+        LIB["26 rules<br/>L1 general 11 · L2 compute 8 · L3 writing 7"]
+        DEP["deploy.sh<br/>pick layers · safe to re-run · never clobbers your text"]
+        SK --> DEP
+        LIB --> DEP
+    end
 
-    DEP --> CM["CLAUDE.md<br/>what the agent reads before starting"]
-    DEP --> TD["docs/TODO.md<br/>left to do · blocked · dropped"]
-    DEP --> RL["docs/RULES.md<br/>what went wrong in this project"]
-    DEP --> PV["docs/PROVENANCE.md<br/>each number → weights code logs"]
-    DEP --> RT["scripts/run_task.sh<br/>resumes · never fakes success"]
+    subgraph PROJ["② lands in your project"]
+        direction LR
+        RL["docs/RULES.md<br/>what went wrong in this project"]
+        MO["docs/monitoring.md<br/>how to catch a silent failure"]
+        TD["docs/TODO.md<br/>left to do · blocked · dropped"]
+        PV["docs/PROVENANCE.md<br/>each number → weights code logs"]
+        RT["scripts/run_task.sh<br/>resumes · never fakes success"]
+    end
 
-    CM --> AG(["Agent, running 24/7"])
-    TD --> AG
+    DEP --> RL
+    DEP --> MO
+    DEP --> TD
+    DEP --> PV
+    DEP --> RT
+    DEP -->|"26 rules into context"| AG
+
+    AG(["③ Agent, running 24/7"])
+    RL -->|"never hit the same one twice"| AG
+    MO -->|"a crash has to be visible"| AG
+    TD -->|"what to do next"| AG
     AG --> RT
     RT -->|"marker only on success<br/>FAILED on failure"| AG
-    AG -->|"log the incident as it happens"| RL
-    AG -->|"evidence for every number"| PV
-    AG -->|"tick it off when done"| TD
-    RL -->|"never hit the same one twice"| CM
-    HU(["You"]) -->|"review the queue every 4h"| TD
-    PV -->|"results you can check"| HU
+
+    AG -.->|"log the incident as it happens"| RL
+    AG -.->|"evidence for every number"| PV
+    AG -.->|"tick it off when done"| TD
+
+    HU(["④ you"])
+    HU ==>|"review the queue every 4h"| TD
+    PV ==>|"results you can check"| HU
+
+    classDef setup fill:#EEF2FF,stroke:#6366F1,stroke-width:1.5px,color:#1E1B4B
+    classDef files fill:#F0FDF4,stroke:#16A34A,stroke-width:1.5px,color:#052E16
+    classDef agent fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#451A03
+    classDef human fill:#FFE4E6,stroke:#E11D48,stroke-width:2px,color:#4C0519
+    class SK,LIB,DEP setup
+    class RL,MO,TD,PV,RT files
+    class AG agent
+    class HU human
 ```
 
 ## Quick start
@@ -112,6 +142,7 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
   [dry-run] 新建   docs/RULES.md
   [dry-run] 新建   docs/TODO.md
   [dry-run] 新建   docs/PROVENANCE.md
+  [dry-run] 新建   docs/monitoring.md
   [dry-run] 新建   scripts/run_task.sh
   [dry-run] 追加   .gitignore
 
@@ -128,10 +159,11 @@ The script speaks Chinese, like the rules it deploys.
 | `docs/RULES.md` | what went wrong in *this* project and what to do next time. Starts empty; you add to it as you go | No |
 | `docs/TODO.md` | what is still to do, what is blocked waiting on someone, what was dropped | No |
 | `docs/PROVENANCE.md` | which file each published number came from, plus the criteria you fixed **before** looking | No |
+| `docs/monitoring.md` | how to monitor a run that lasts tens of hours: eight ways a failure stays silent. Ready to use, nothing to fill in | No |
 | `scripts/run_task.sh` | the script template for long runs: resumes after an interruption, never fakes success on failure | No |
 | `.gitignore` | keeps run artifacts, logs and LaTeX intermediates out of git | appended once, at the end |
 
-Once those four files under `docs/` and `scripts/` exist they belong to the
+Once those five files under `docs/` and `scripts/` exist they belong to the
 project. Changing that takes `--force`.
 
 `run_task.sh` treats its own directory as the run root and writes only relative
@@ -193,6 +225,36 @@ Rules are tagged by scope, so a frontend project does not inherit GPU advice.
 
 </details>
 
+## Monitoring a long run
+
+A job runs for tens of hours and the agent cannot watch it the whole time. The
+real problem is that **failure is usually silent**: the process died, the artifact
+count stopped moving, the log went quiet. From the outside all of that looks
+exactly like "still running".
+
+`docs/monitoring.md` covers eight practices for this. The ones that bite hardest:
+
+- **Grepping only for success markers makes you blind to crashes.** `grep "step="`
+  says nothing at all on a crash, a hang or an OOM. Ask yourself: if this process
+  died right now, would my filter print anything? If the answer is not yes, widen
+  it to `grep -E "step=|Traceback|CUDA out of memory|Killed|FAILED|assert"`. Noise
+  beats silence on a crashloop.
+- **Monitoring and compute belong in separate process trees.** Launch compute with
+  `setsid nohup`. The source project had its monitor killed once and the compute
+  chain was untouched; in one tree, stopping the monitor stops the experiment.
+- **An artifact count alone does not prove anything is alive.** After an OOM the
+  chain exits and the process disappears while the file count sits still, so
+  counting alone reads as "still running" and costs you an hour of waiting. Check
+  artifacts and processes together.
+- **Every watcher needs a stop condition.** One `while pgrep ...; do sleep; done`
+  kept polling long after its target had finished, **spinning for 1 day 20 hours**
+  before anyone noticed. It raises no error, uses no resources, and never exits by
+  itself.
+
+The other four (event dedup, re-arming after a trigger, staggered thresholds,
+poll intervals) are in
+[`docs/monitoring.md`](skills/agent-workflow/assets/practices/monitoring.md).
+
 ## Using run_task.sh
 
 The skeleton runs nothing by itself. You write each stage as one `step` line:
@@ -241,7 +303,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run          # preview
 bash ~/.claude/skills/agent-workflow/deploy.sh                    # all layers
 bash ~/.claude/skills/agent-workflow/deploy.sh --layers l1,l2     # subset
 bash ~/.claude/skills/agent-workflow/deploy.sh --target ../other  # elsewhere
-bash ~/.claude/skills/agent-workflow/deploy.sh --force            # overwrite those four files too
+bash ~/.claude/skills/agent-workflow/deploy.sh --force            # overwrite those five files too
 ```
 
 | Flag | Default | What it does |
@@ -249,7 +311,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --force            # overwrite th
 | `--target DIR` | current directory | which project to deploy into |
 | `--layers l1,l2,l3` | all three | which layers to keep; an unknown layer name is an error, never a silently empty ruleset |
 | `--dry-run` | off | print what would happen, write nothing |
-| `--force` | off | allow overwriting those four existing files (three record files + `run_task.sh`) |
+| `--force` | off | allow overwriting those five existing files (three records + the monitoring guide + `run_task.sh`) |
 
 For the installer: `--project` installs into `./.claude/skills/` of the **current
 directory**, scoped to that repo and committable for a team. It goes by where you
@@ -343,7 +405,7 @@ the block refreshes in place. Rule numbers are identical in every combination, s
 cross-references never break.
 
 **I have half-filled records. Will a re-run wipe them?**
-No. The four files under `docs/` and `scripts/` are never overwritten once they
+No. The five files under `docs/` and `scripts/` are never overwritten once they
 exist, unless you pass `--force` yourself.
 
 **Can I use this without Claude Code?**
@@ -377,7 +439,7 @@ that writes into your project is `deploy.sh`, and it has `--dry-run`.
 
 **Will it push on its own, or edit my code?**
 Two separate layers, do not conflate them. **The template itself will not.**
-`deploy.sh` writes six files into your project (one of which appends a block to
+`deploy.sh` writes seven files into your project (one of which appends a block to
 `.gitignore`), touches no git config, goes nowhere online, and asks for no
 permissions. The only network call is `install.sh` cloning this repo on the
 `curl | bash` path, and `run_task.sh` runs nothing until you put your own
@@ -418,6 +480,7 @@ skills/agent-workflow/
     gitignore.snippet
     scaffold/{RULES,TODO,PROVENANCE}.md
     scaffold/run_task.sh
+    practices/monitoring.md      monitoring long runs: eight ways failure stays silent
 ```
 
 ## License

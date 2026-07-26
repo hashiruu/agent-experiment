@@ -54,7 +54,8 @@ chmod +x "$DEST/deploy.sh" "$DEST/assets/scaffold/run_task.sh"
 # --- 校验 --------------------------------------------------------------------
 for f in SKILL.md deploy.sh assets/CLAUDE.md assets/gitignore.snippet \
          assets/scaffold/RULES.md assets/scaffold/TODO.md \
-         assets/scaffold/PROVENANCE.md assets/scaffold/run_task.sh; do
+         assets/scaffold/PROVENANCE.md assets/scaffold/run_task.sh \
+         assets/practices/monitoring.md; do
     [ -f "$DEST/$f" ] || die "安装不完整: 缺少 $f"
 done
 bash -n "$DEST/deploy.sh" || die "deploy.sh 语法检查未通过"

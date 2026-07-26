@@ -18,31 +18,60 @@
 > 一个 7 × 24 小时不间断运行，帮你跑实验、用 Git 维护公开仓库、更新 LaTeX（Overleaf）论文的科研自动化工作流。
 
 你只需要装一次 skill，然后在项目里运行一条部署命令，26 条长任务工作纪律、三份记录文件、
-一个中断能接着跑的任务脚本就会自动落到位。规则来自一篇真实产出的顶会论文，那个项目长期无人值守地跑，每条规则背后都有一次真实的事故。
+一份长任务监控手册、一个中断能接着跑的任务脚本就会自动落到位。规则来自一篇真实产出的顶会论文，那个项目长期无人值守地跑，每条规则背后都有一次真实的事故。
 
 ## 架构展示
 
 ```mermaid
 flowchart TB
-    LIB["26 条规则<br/>L1 通用 11 · L2 计算实验 8 · L3 论文写作 7"] --> DEP
-    SK["skill 入口<br/>/agent-workflow"] --> DEP["deploy.sh<br/>按需选层 · 可重复跑 · 不覆盖你写的东西"]
+    subgraph SETUP["① 装一次"]
+        direction LR
+        SK["skill 入口<br/>/agent-workflow"]
+        LIB["26 条规则<br/>L1 通用 11 · L2 计算实验 8 · L3 论文写作 7"]
+        DEP["deploy.sh<br/>按需选层 · 可重复跑 · 不覆盖你写的东西"]
+        SK --> DEP
+        LIB --> DEP
+    end
 
-    DEP --> CM["CLAUDE.md<br/>agent 开工前读的规则"]
-    DEP --> TD["docs/TODO.md<br/>还剩什么 · 什么卡住 · 什么砍了"]
-    DEP --> RL["docs/RULES.md<br/>这个项目自己踩过的坑"]
-    DEP --> PV["docs/PROVENANCE.md<br/>每个数字 → 权重 代码 日志"]
-    DEP --> RT["scripts/run_task.sh<br/>中断能接着跑 · 失败不假装成功"]
+    subgraph PROJ["② 落进你的项目"]
+        direction LR
+        RL["docs/RULES.md<br/>这个项目自己踩过的坑"]
+        MO["docs/monitoring.md<br/>怎么发现静默失败"]
+        TD["docs/TODO.md<br/>还剩什么 · 什么卡住 · 什么砍了"]
+        PV["docs/PROVENANCE.md<br/>每个数字 → 权重 代码 日志"]
+        RT["scripts/run_task.sh<br/>中断能接着跑 · 失败不假装成功"]
+    end
 
-    CM --> AG(["Agent 7×24 跑"])
-    TD --> AG
+    DEP --> RL
+    DEP --> MO
+    DEP --> TD
+    DEP --> PV
+    DEP --> RT
+    DEP -->|"26 条规则进上下文"| AG
+
+    AG(["③ Agent 7×24 跑"])
+    RL -->|"同样的坑不踩第二次"| AG
+    MO -->|"崩了要能被看见"| AG
+    TD -->|"下一件事做什么"| AG
     AG --> RT
     RT -->|"成功才写完成标记<br/>失败写 FAILED"| AG
-    AG -->|"踩坑当场回写"| RL
-    AG -->|"每个对外数字留证据"| PV
-    AG -->|"做完就勾掉"| TD
-    RL -->|"同样的坑不踩第二次"| CM
-    HU(["你"]) -->|"每 4 小时复核队列"| TD
-    PV -->|"可核对的结果"| HU
+
+    AG -.->|"踩坑当场回写"| RL
+    AG -.->|"每个对外数字留证据"| PV
+    AG -.->|"做完就勾掉"| TD
+
+    HU(["④ 你"])
+    HU ==>|"每 4 小时复核队列"| TD
+    PV ==>|"可核对的结果"| HU
+
+    classDef setup fill:#EEF2FF,stroke:#6366F1,stroke-width:1.5px,color:#1E1B4B
+    classDef files fill:#F0FDF4,stroke:#16A34A,stroke-width:1.5px,color:#052E16
+    classDef agent fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#451A03
+    classDef human fill:#FFE4E6,stroke:#E11D48,stroke-width:2px,color:#4C0519
+    class SK,LIB,DEP setup
+    class RL,MO,TD,PV,RT files
+    class AG agent
+    class HU human
 ```
 
 ## 快速开始
@@ -98,6 +127,7 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
   [dry-run] 新建   docs/RULES.md
   [dry-run] 新建   docs/TODO.md
   [dry-run] 新建   docs/PROVENANCE.md
+  [dry-run] 新建   docs/monitoring.md
   [dry-run] 新建   scripts/run_task.sh
   [dry-run] 追加   .gitignore
 
@@ -112,10 +142,11 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
 | `docs/RULES.md` | 记这个项目自己踩过的坑：出了什么事、下次怎么做。空白模板，边跑边往里加 | 不会 |
 | `docs/TODO.md` | 记还剩什么要做、什么卡在等别人、什么已经砍了不做 | 不会 |
 | `docs/PROVENANCE.md` | 记每个对外的数字是从哪个文件算出来的，以及**动手前**就定好的判断标准 | 不会 |
+| `docs/monitoring.md` | 怎么监控一个跑几十小时的任务：静默失败的八种防法。现成的，不用填 | 不会 |
 | `scripts/run_task.sh` | 跑长任务用的脚本模板：中断了能接着跑，失败了不会假装成功 | 不会 |
 | `.gitignore` | 告诉 git 别把实验产物、日志、LaTeX 中间文件提交上去 | 只在末尾追加一次 |
 
-`docs/` 和 `scripts/` 下那四份文件一旦建成就归项目自己所有，真要覆盖得加 `--force`。
+`docs/` 和 `scripts/` 下那五份文件一旦建成就归项目自己所有，真要覆盖得加 `--force`。
 
 `run_task.sh` 把自己所在的目录当成运行根，只写相对路径，所以日志、结果、进度标记都落在 `scripts/` 下面。
 这是有意的，绝不写全局路径（见 L2 第 14 条）。想让产物去别处，把脚本挪个位置就行。
@@ -174,6 +205,26 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
 
 </details>
 
+## 监控长任务
+
+任务跑几十小时，agent 不能一直盯着。真正的麻烦是**失败往往是静默的**——进程死了、
+产物计数停住、日志不再增长，这些从外面看和"正在跑"一模一样。
+
+`docs/monitoring.md` 是专门针对这件事的八条做法，几条最要命的：
+
+- **只 grep 成功标记，等于对崩溃完全静默。** `grep "step="` 在 crash、挂死、OOM 时一句话都不会说。
+  自检问一句：这个进程现在崩了，我的过滤器会输出任何东西吗？答不出"会"就把 grep 放宽到
+  `grep -E "step=|Traceback|CUDA out of memory|Killed|FAILED|assert"`。宁可多噪声，不可对 crashloop 静默。
+- **监控和计算必须分开进程树。** 计算用 `setsid nohup` 起。原项目的监控进程被杀过一次，
+  计算链毫发无损；要是两者在同一进程树里，停监控就等于停实验。
+- **产物计数不能单独当存活判据。** 某步 OOM 后整条链退出、进程消失，而输出目录的文件数
+  停在某个值不动，只看计数会误判成"还在跑"，白等一小时。巡检要同时看产物和进程。
+- **watcher 必须有终止条件。** 一个 `while pgrep ...; do sleep; done` 在目标脚本早就结束之后
+  仍在轮询，**空转了 1 天 20 小时**才被发现——它不报错、不占资源、也不会自己退出。
+
+剩下的四条（事件去重、触发后立刻补挂、多 watcher 错开阈值、轮询间隔怎么定）见
+[`docs/monitoring.md`](skills/agent-workflow/assets/practices/monitoring.md)。
+
 ## run_task.sh 怎么用
 
 骨架本身不跑任何东西，你把每个阶段写成一行 `step`：
@@ -217,7 +268,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run          # 先看会写
 bash ~/.claude/skills/agent-workflow/deploy.sh                    # 全部三层
 bash ~/.claude/skills/agent-workflow/deploy.sh --layers l1,l2     # 只要其中几层
 bash ~/.claude/skills/agent-workflow/deploy.sh --target ../其他   # 装到别处
-bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那四份文件一起覆盖
+bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那五份文件一起覆盖
 ```
 
 | 参数 | 默认 | 说明 |
@@ -225,7 +276,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那四份
 | `--target 目录` | 当前目录 | 部署到哪个项目 |
 | `--layers l1,l2,l3` | 三层全上 | 要哪几层；层名写错会直接报错，不会静默产出空规则 |
 | `--dry-run` | 关 | 只打印会做什么，一个字节都不写 |
-| `--force` | 关 | 允许覆盖已存在的那四份文件（三份记录文件 + `run_task.sh`）|
+| `--force` | 关 | 允许覆盖已存在的那五份文件（三份记录 + 监控手册 + `run_task.sh`）|
 
 安装脚本：`--project` 装进**当前目录**的 `./.claude/skills/`，只对这个仓库生效，可以提交给团队共用。
 注意它看的是你敲命令时所在的目录，所以要在**你自己的项目根目录**下跑，用绝对路径调模板里的脚本：
@@ -293,7 +344,7 @@ bash ~/克隆下来的/agent-research-workflow/install.sh --project
 规则编号在任何组合下都不变，交叉引用不会错位。
 
 **记录写了一半，重跑会被清空吗？**
-不会。`docs/` 和 `scripts/` 下那四份文件一旦存在就永不覆盖，除非你自己加 `--force`。
+不会。`docs/` 和 `scripts/` 下那五份文件一旦存在就永不覆盖，除非你自己加 `--force`。
 
 **不用 Claude Code 能用吗？**
 能，见上面[用 Codex、Gemini CLI 或别的 agent](#用-codexgemini-cli-或别的-agent)。
@@ -318,7 +369,7 @@ bash ~/克隆下来的/agent-research-workflow/install.sh --project
 真正会往你项目里写文件的是 `deploy.sh`，它有 `--dry-run`，写之前先看一眼。
 
 **它会不会自己 push、自己改我的代码？**
-分两层说，别混。**模板自己不会**：`deploy.sh` 只往你项目里写 6 个文件（其中会往 `.gitignore`
+分两层说，别混。**模板自己不会**：`deploy.sh` 只往你项目里写 7 个文件（其中会往 `.gitignore`
 末尾追加一段），不改 git 配置、不联网、不申请任何权限；唯一联网的是 `install.sh` 走
 `curl | bash` 时克隆本仓库；`run_task.sh` 要你自己往里填命令才会跑东西。
 
@@ -352,6 +403,7 @@ skills/agent-workflow/
     gitignore.snippet
     scaffold/{RULES,TODO,PROVENANCE}.md
     scaffold/run_task.sh
+    practices/monitoring.md      长任务监控：静默失败的八种防法
 ```
 
 ## 许可
