@@ -2,7 +2,7 @@
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-64748B)](README.md)
 [![English](https://img.shields.io/badge/docs-English-2563EB)](README.en.md)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-EF6C00)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#requirements)
 
@@ -286,47 +286,17 @@ bash ~/where-you-cloned/agent-experiment/install.sh --project
 
 ## In practice: the more GPUs, the better it pays
 
-Queue never idle, resume from checkpoint, land every result the moment it exists.
-**Measured at roughly 25x**: seven days covered close to what half a year used to.
-
-**Your job is to write the experiments you want into `docs/TODO.md`.** It takes it
-from there: work out which card is actually free, spread the queue across them, and
-start the next one the moment something finishes. While you sleep, teach or sit in
-a meeting, the machines are not idling waiting for you to type. The more cards you
-have, the bigger the gap: four cards means four chains running at once, and all you
-do is glance at the queue every few hours.
+Write the experiments you want into `docs/TODO.md` and leave the rest to it:
+whichever card is free gets the next job, and the moment one finishes another
+starts. Four cards means four chains running at once, and all you do is glance at
+the queue every few hours. Measured at roughly 25x, seven days covering close to
+what half a year used to.
 
 Running several chains at once is not hard because starting a job is hard. It is
-hard because **the chains step on each other**. What you no longer have to watch:
-
-- **Is that card really free?** `CUDA_VISIBLE_DEVICES` indices lie, and an
-  `nvidia-smi` error does not mean the card is broken. Read it wrong once and you
-  schedule onto a card that is already full, and both jobs OOM. (L2 rules 12 and 13)
-- **Will it collide with itself?** Check the queue before launching, not just the
-  process list: a scheduler sitting in a wait loop looks like nothing is running
-  when it is about to start the same chain. (L1 rule 3)
-- **If it collides, does data die?** One directory per run, relative paths only, so
-  two chains never write the same file and no row of your table ends up from a
-  different source than the rest. (L2 rule 14)
-- **How much has to be rerun after a crash?** Staged artifacts, so only the step
-  that died runs again. An OOM in the last step costs minutes, not tens of hours.
-  (L2 rule 15)
-- **Can it pretend it finished?** The completion marker is written only after
-  everything succeeds, and monitoring accepts only markers from this round. A
-  leftover marker from a failed batch really did fool the monitor once. (L1 rule 2)
-
-The same holds for the paper and the repo, so what you come back to can be trusted:
-
-- After a rerun replaces the numbers, every old value gets grepped out of the whole
-  document, so the table never disagrees with the prose. (L1 rule 5)
-- Every push is followed by an assertion that local equals remote, added because a
-  push really did fail silently. (L3 rule 20)
-- LaTeX is always compiled. One edit dropped a `figure` into another table's body,
-  every static check passed, and the document was still broken. (L3 rule 21)
-
-One honest note: the template ships no scheduler daemon. **The agent does the
-scheduling**; these rules are what make parallel runs safe to attempt and quiet
-failures impossible to miss.
+hard because the chains step on each other: whether that card is really free,
+whether it collides with itself, whether a collision corrupts the results, which
+step to resume from after a crash. It handles all of that, so what you come back
+to in the morning is something you can put straight into the paper.
 
 ## Design principles
 
@@ -418,7 +388,7 @@ gets pushed at 3am is how you launch your agent and what you granted it, not thi
 template. If you do not want it near Git, do not install L3: `--layers l1` or
 `--layers l1,l2`.
 
-## Honest notes
+## Notes
 
 The rules are in Chinese. They were recorded in the language the incidents
 happened in, and translating them costs the precision that makes them usable.
@@ -426,14 +396,6 @@ happened in, and translating them costs the precision that makes them usable.
 Dataset names and metric values in the rule examples have been replaced with
 stand-ins. The incidents and their magnitude are real, but the specific numbers
 are not the source project's results, so do not quote them.
-
-What was deliberately left out: dataset names, path conventions, thresholds,
-hyperparameters, GPU topology, quirks of one upstream repo. Those belong in a
-project's own `docs/RULES.md`. Mixed into `CLAUDE.md` they drown the general
-rules, and the next agent stops reading.
-
-The test for whether a rule belongs here: change the dataset, change the paper,
-does it still hold? If not, it stays where it was learned.
 
 ## Layout
 
@@ -453,4 +415,4 @@ skills/agent-experiment/
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+[CC BY-NC 4.0](LICENSE): free to use, modify and redistribute with attribution, **not for commercial use**.
