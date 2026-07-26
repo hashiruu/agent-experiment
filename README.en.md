@@ -24,9 +24,9 @@
 
 Install the skill once, run one deploy command inside your project, and 26 rules
 of long-horizon working discipline, three record files and a task script that
-resumes after an interruption land in place. The rules were not invented. They
-come out of the work behind a real top-tier conference paper, produced by a
-project that ran unattended for a long stretch, one incident at a time.
+resumes after an interruption land in place. The rules come out of the work
+behind a real top-tier conference paper: a project that ran unattended for a long
+stretch, and every rule in here has a real incident behind it.
 
 ## Architecture
 
