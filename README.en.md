@@ -12,10 +12,8 @@
 > gets pushed to a public repo, whether a number in the paper changes. While it
 > waits it parks the item in the blocked section of `docs/TODO.md` and moves on to
 > work that does not depend on it, so it never idles, but that one item stays stuck
-> until you come back. **Review `docs/TODO.md` at least every 4 hours** (`/loop` can
-> do the reminding, see [Monitoring a long run](#monitoring-a-long-run)): catching a
-> wrong direction after 4 hours costs one rerun, catching it after two days costs
-> two days.
+> until you come back. **Review `docs/TODO.md` at least every 4 hours**; `/loop` can
+> do the reminding, see [Monitoring a long run](#monitoring-a-long-run).
 
 > A research automation workflow that runs 24/7: it runs your experiments,
 > maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
