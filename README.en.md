@@ -2,6 +2,7 @@
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-64748B)](README.md)
 [![English](https://img.shields.io/badge/docs-English-2563EB)](README.en.md)
+[![ci](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml/badge.svg)](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-EF6C00)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#requirements)
@@ -24,6 +25,19 @@ for a long stretch, and every rule in here has a real incident behind it.
   can be traced back to where it came from
 - **Repetitive runs across seeds and configs**: write them into the queue once, and
   whichever card frees up picks up the next one
+
+**You do not have to take my word for it:**
+
+- **Every push runs end to end** — install the skill, deploy it, run a real task, then
+  make it fail on purpose and check that a failure never writes a completion marker.
+  A green badge means it still holds right now; click it to read every step's output.
+- **One real run is kept in the repo** — [`examples/run-ci-demo/`](examples/) holds the
+  log, the completion marker, the code snapshot, the weights and the metric, produced
+  by that CI run rather than typed by hand.
+- **All 26 rules are there to read** — each with the incident that produced it, in
+  [`assets/CLAUDE.md`](skills/agent-experiment/assets/CLAUDE.md).
+- **You can see what it would write before it writes** — `deploy.sh --dry-run` touches
+  nothing.
 
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops

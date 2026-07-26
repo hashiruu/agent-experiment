@@ -2,6 +2,7 @@
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-2563EB)](README.md)
 [![English](https://img.shields.io/badge/docs-English-64748B)](README.en.md)
+[![ci](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml/badge.svg)](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-EF6C00)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#前置条件)
@@ -16,6 +17,16 @@
 - **自动化工作流**：一条链挂着跑几十小时，中途断了能接着跑，不用守在终端前
 - **SOTA 实验**：几个 baseline 同时铺开对比，跑完每个数字都能指回它是从哪来的
 - **多种子、多配置的重复性实验**：一次写进队列，哪块卡空了就自动补上去
+
+**这套东西可以自己验，不用信我：**
+
+- **每次 push 都跑一遍端到端** —— 装 skill、部署、跑一个真实任务、再故意让它失败，
+  确认失败时不会写完成标记。绿灯就是"此刻仍然成立"，点上面的 ci 徽章看每一步的输出。
+- **有一次真实运行留下的产物** —— [`examples/run-ci-demo/`](examples/) 里是日志、完成标记、
+  代码快照、权重和指标，由上面那条 CI 真跑出来的，不是手写的示意文件。
+- **26 条规则可以逐条点开看** —— 每条都带"怎么踩到的"实例，
+  正文在 [`assets/CLAUDE.md`](skills/agent-experiment/assets/CLAUDE.md)。
+- **落地前可以先看它要写什么** —— `deploy.sh --dry-run` 一个字节都不写，先看清楚再决定。
 
 > [!WARNING]
 > **它自动化的是执行，不是判断。** 关键决策它会停下来等你：这批结果能不能采信、要不要推到

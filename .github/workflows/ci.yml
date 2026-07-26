@@ -1,0 +1,68 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  end-to-end:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 安装 skill
+        run: |
+          mkdir -p /tmp/skills
+          ./install.sh --dir /tmp/skills
+          test -f /tmp/skills/agent-experiment/SKILL.md
+          test -x /tmp/skills/agent-experiment/deploy.sh
+
+      - name: dry-run 不写任何文件
+        run: |
+          mkdir -p /tmp/proj && cd /tmp/proj
+          bash /tmp/skills/agent-experiment/deploy.sh --dry-run
+          test -z "$(ls -A /tmp/proj)" || { echo "dry-run 写了文件"; exit 1; }
+
+      - name: 部署并核对落地内容
+        run: |
+          cd /tmp/proj
+          bash /tmp/skills/agent-experiment/deploy.sh
+          for f in CLAUDE.md docs/RULES.md docs/TODO.md docs/PROVENANCE.md docs/monitoring.md scripts/run_task.sh .gitignore; do
+            test -f "$f" || { echo "缺少 $f"; exit 1; }
+          done
+          n=$(grep -c '^### [0-9]' CLAUDE.md)
+          test "$n" -eq 26 || { echo "规则应为 26 条, 实为 $n"; exit 1; }
+
+      - name: 分层过滤与错误处理
+        run: |
+          mkdir -p /tmp/p2 && bash /tmp/skills/agent-experiment/deploy.sh --target /tmp/p2 --layers l1
+          test "$(grep -c '^### [0-9]' /tmp/p2/CLAUDE.md)" -eq 11
+          bash /tmp/skills/agent-experiment/deploy.sh --target /tmp/p2 --layers l9 && { echo "错误层名未报错"; exit 1; } || true
+
+      - name: 重复部署不覆盖已有记录
+        run: |
+          cd /tmp/proj
+          echo "MY OWN NOTE" >> docs/RULES.md
+          bash /tmp/skills/agent-experiment/deploy.sh
+          grep -q "MY OWN NOTE" docs/RULES.md || { echo "记录文件被覆盖"; exit 1; }
+
+      - name: 跑一个真实任务，核对产物与代码快照
+        run: |
+          cd /tmp/proj && mkdir -p code && echo 'print("hello")' > code/train.py
+          sed -i 's|^# step 1_prepare.*|step 1_train bash -c "echo weights > results/$TAG/best.pth; echo score=0.91 > results/$TAG/RESULT.txt"|' scripts/run_task.sh
+          bash scripts/run_task.sh ci-demo 0
+          test -f scripts/results/ci-demo/best.pth
+          test -f scripts/results/ci-demo/code/train.py
+          test -f scripts/logs/ci-demo.log
+          test -f scripts/ALLDONE_ci-demo
+          echo "--- ALLDONE 内容 ---"; cat scripts/ALLDONE_ci-demo
+
+      - name: 失败路径绝不写完成标记
+        run: |
+          cd /tmp/proj && rm -f scripts/ALLDONE_fail scripts/FAILED_fail
+          sed -i 's|^step 1_train.*|step 1_boom bash -c "exit 1"|' scripts/run_task.sh
+          bash scripts/run_task.sh fail 0 || true
+          test ! -f scripts/ALLDONE_fail || { echo "失败却写了完成标记"; exit 1; }
+          test -f scripts/FAILED_fail || { echo "失败未写 FAILED 标记"; exit 1; }
