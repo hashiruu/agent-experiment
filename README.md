@@ -40,6 +40,12 @@ cd agent-experiment
 curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 ```
 
+装到 Codex / Gemini CLI / Copilot 等十几种 agent（一条命令，自动放对位置）：
+
+```bash
+npx skills add hashiruu/agent-experiment
+```
+
 也可以当 Claude Code 插件装，不用碰命令行：
 
 ```

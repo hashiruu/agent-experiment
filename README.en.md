@@ -48,6 +48,12 @@ Without cloning:
 curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 ```
 
+For Codex, Gemini CLI, Copilot and a dozen other agents (one command, put in the right place automatically):
+
+```bash
+npx skills add hashiruu/agent-experiment
+```
+
 Or install it as a Claude Code plugin, without touching the shell:
 
 ```
