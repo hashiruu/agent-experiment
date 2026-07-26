@@ -28,11 +28,7 @@ resumes after an interruption land in place. The rules were not invented. They
 come out of the work behind a real top-tier conference paper, produced by a
 project that ran unattended for a long stretch, one incident at a time.
 
-## How it works
-
-Copying the rules in is not the point. They constrain execution, execution leaves
-evidence, incidents get written back as new rules, and a human shows up only at
-the decision points:
+## Architecture
 
 ```mermaid
 flowchart TB
