@@ -19,35 +19,7 @@
 
 ## 架构展示
 
-```mermaid
-flowchart TB
-    subgraph CORE["核心循环"]
-        Q["TODO 队列<br/>docs/TODO.md"]
-        T["起任务<br/>scripts/run_task.sh"]
-        R["回写踩坑<br/>docs/RULES.md"]
-        Q --> T
-        T --> R
-        R --> Q
-    end
-
-    Q --- D{"关键<br/>决策?"}
-    D <-->|"是 · 挂进阻塞区等你决策<br/>决策给出 · 重新入队"| HU(["你"])
-    HU -.->|"每 4h 复核队列"| Q
-
-    MO(["监控程序<br/>docs/monitoring.md"]) -.->|"盯着"| T
-    MO -.->|"崩了 · 回队列重排"| Q
-    T -.->|"每次运行记一笔"| PV(["实验日志<br/>docs/PROVENANCE.md"])
-
-    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
-    classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC
-    classDef ext fill:#F1F5F9,stroke:#94A3B8,color:#334155
-    classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class Q,T,R step
-    class D gate
-    class MO,PV ext
-    class HU human
-    style CORE fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
-```
+<img src="assets/architecture.svg" alt="架构图" width="100%">
 
 ## 快速开始
 
@@ -381,6 +353,7 @@ bash ~/克隆下来的/agent-experiment/install.sh --project
 
 ```
 install.sh                       安装 skill
+assets/architecture.svg          架构图（中 / 英两版）
 skills/agent-experiment/
   SKILL.md                       入口：何时部署、选哪几层
   deploy.sh                      部署脚本，可重复跑 + 分层过滤

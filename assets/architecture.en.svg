@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1140 500" width="1140" height="500" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans CJK SC','PingFang SC','Microsoft YaHei',Helvetica,Arial,sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#334155"/>
+    </marker>
+    <marker id="ad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#94A3B8"/>
+    </marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#0284C7"/>
+    </marker>
+  </defs>
+  <rect width="1140" height="500" fill="#FFFFFF"/>
+  <rect x="390" y="72" width="210" height="66" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="495.0" y="99" text-anchor="middle" font-size="15" fill="#0F172A">the queue</text>
+  <text x="495.0" y="120" text-anchor="middle" font-size="12.5" fill="#0F172A" opacity="0.72">docs/TODO.md</text>
+  <rect x="260" y="352" width="220" height="66" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="370.0" y="379" text-anchor="middle" font-size="15" fill="#0F172A">run the task</text>
+  <text x="370.0" y="400" text-anchor="middle" font-size="12.5" fill="#0F172A" opacity="0.72">scripts/run_task.sh</text>
+  <rect x="545" y="352" width="210" height="66" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="1.5"/>
+  <text x="650.0" y="379" text-anchor="middle" font-size="15" fill="#0F172A">log the incident</text>
+  <text x="650.0" y="400" text-anchor="middle" font-size="12.5" fill="#0F172A" opacity="0.72">docs/RULES.md</text>
+  <text x="505" y="250" text-anchor="middle" font-size="15" fill="#94A3B8" letter-spacing="1">the core loop</text>
+  <path d="M440,140 C 410,215 375,285 370,346" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M480,385 L539,385" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+  <path d="M755,385 C 820,300 715,165 580,141" fill="none" stroke="#334155" stroke-width="2" marker-end="url(#a)"/>
+  <rect x="15" y="358" width="186" height="54" rx="27.0" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="95.0" y="385" text-anchor="middle" font-size="15" fill="#334155">experiment log</text>
+  <text x="95.0" y="406" text-anchor="middle" font-size="11" fill="#334155" opacity="0.72">docs/PROVENANCE.md</text>
+  <path d="M258,385 L207,385" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ad)"/>
+  <text x="108" y="348" text-anchor="middle" font-size="11.5" fill="#475569">one entry per run</text>
+  <rect x="40" y="78" width="176" height="54" rx="27.0" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1.5"/>
+  <text x="128.0" y="105" text-anchor="middle" font-size="15" fill="#334155">the monitor</text>
+  <text x="128.0" y="126" text-anchor="middle" font-size="11.5" fill="#334155" opacity="0.72">docs/monitoring.md</text>
+  <path d="M128,134 C 128,235 190,295 246,346" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ad)"/>
+  <text x="142" y="240" text-anchor="end" font-size="11.5" fill="#475569">watches</text>
+  <path d="M218,105 L384,105" fill="none" stroke="#94A3B8" stroke-width="1.6" stroke-dasharray="4 3" marker-end="url(#ad)"/>
+  <text x="301" y="96" text-anchor="middle" font-size="11.5" fill="#475569">crashed · requeue it</text>
+  <path d="M600,105 L631,105" fill="none" stroke="#334155" stroke-width="1.6"/>
+  <path d="M685,72 L739,105 L685,138 L631,105 Z" fill="#1E293B" stroke="#0F172A"/>
+  <text x="685" y="101" text-anchor="middle" font-size="12" fill="#F8FAFC">key</text>
+  <text x="685" y="116" text-anchor="middle" font-size="12" fill="#F8FAFC">decision?</text>
+  <circle cx="1010" cy="105" r="38" fill="#E0F2FE" stroke="#0284C7" stroke-width="1.8"/>
+  <text x="1010" y="110" text-anchor="middle" font-size="15" fill="#0C4A6E">you</text>
+  <path d="M747,105 L966,105" fill="none" stroke="#334155" stroke-width="1.8" marker-end="url(#a)" marker-start="url(#a)"/>
+  <text x="836" y="86" text-anchor="middle" font-size="11" fill="#475569">yes · parked as blocked, waiting on you</text>
+  <text x="836" y="130" text-anchor="middle" font-size="11" fill="#475569">decision made · back on the queue</text>
+  <path d="M1010,65 C 1010,22 850,16 495,20 L495,66" fill="none" stroke="#0284C7" stroke-width="1.8" stroke-dasharray="5 4" marker-end="url(#ab)"/>
+  <text x="700" y="14" text-anchor="middle" font-size="11.5" fill="#475569">review the queue every 4h</text>
+</svg>

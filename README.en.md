@@ -28,35 +28,7 @@ stretch, and every rule in here has a real incident behind it.
 
 ## Architecture
 
-```mermaid
-flowchart TB
-    subgraph CORE["the core loop"]
-        Q["the queue<br/>docs/TODO.md"]
-        T["run the task<br/>scripts/run_task.sh"]
-        R["log the incident<br/>docs/RULES.md"]
-        Q --> T
-        T --> R
-        R --> Q
-    end
-
-    Q --- D{"key<br/>decision?"}
-    D <-->|"yes · parked as blocked, waiting on you<br/>decision made · back on the queue"| HU(["you"])
-    HU -.->|"review the queue every 4h"| Q
-
-    MO(["the monitor<br/>docs/monitoring.md"]) -.->|"watches"| T
-    MO -.->|"crashed · requeue it"| Q
-    T -.->|"one entry per run"| PV(["experiment log<br/>docs/PROVENANCE.md"])
-
-    classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
-    classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC
-    classDef ext fill:#F1F5F9,stroke:#94A3B8,color:#334155
-    classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class Q,T,R step
-    class D gate
-    class MO,PV ext
-    class HU human
-    style CORE fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
-```
+<img src="assets/architecture.en.svg" alt="Architecture" width="100%">
 
 ## Quick start
 
@@ -460,6 +432,7 @@ does it still hold? If not, it stays where it was learned.
 
 ```
 install.sh                       installs the skill
+assets/architecture.svg          the diagram (zh / en)
 skills/agent-experiment/
   SKILL.md                       entry point: when to deploy, which layers
   deploy.sh                      deployment script, safe to re-run, layer filtering
