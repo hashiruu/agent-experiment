@@ -25,19 +25,18 @@ flowchart TB
         Q["TODO 队列<br/>docs/TODO.md"]
         T["起任务<br/>scripts/run_task.sh"]
         R["回写踩坑<br/>docs/RULES.md"]
-        Q -->|"否 · 自行推进"| T
+        Q --> T
         T --> R
         R --> Q
     end
 
     Q --- D{"关键<br/>决策?"}
-    D -->|"是 · 挂进阻塞区等你决策"| HU(["你"])
-    HU -->|"决策给出 · 重新入队"| Q
-    Q ==>|"每 4h 复核队列"| HU
+    D <-->|"是 · 挂进阻塞区等你决策<br/>决策给出 · 重新入队"| HU(["你"])
+    HU -.->|"每 4h 复核队列"| Q
 
-    T -.->|"每次运行记一笔"| PV(["实验日志<br/>docs/PROVENANCE.md"])
     MO(["监控程序<br/>docs/monitoring.md"]) -.->|"盯着"| T
     MO -.->|"崩了 · 回队列重排"| Q
+    T -.->|"每次运行记一笔"| PV(["实验日志<br/>docs/PROVENANCE.md"])
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC

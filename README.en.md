@@ -34,19 +34,18 @@ flowchart TB
         Q["the queue<br/>docs/TODO.md"]
         T["run the task<br/>scripts/run_task.sh"]
         R["log the incident<br/>docs/RULES.md"]
-        Q -->|"no · proceed on its own"| T
+        Q --> T
         T --> R
         R --> Q
     end
 
     Q --- D{"key<br/>decision?"}
-    D -->|"yes · parked as blocked, waiting on you"| HU(["you"])
-    HU -->|"decision made · back on the queue"| Q
-    Q ==>|"review the queue every 4h"| HU
+    D <-->|"yes · parked as blocked, waiting on you<br/>decision made · back on the queue"| HU(["you"])
+    HU -.->|"review the queue every 4h"| Q
 
-    T -.->|"one entry per run"| PV(["experiment log<br/>docs/PROVENANCE.md"])
     MO(["the monitor<br/>docs/monitoring.md"]) -.->|"watches"| T
     MO -.->|"crashed · requeue it"| Q
+    T -.->|"one entry per run"| PV(["experiment log<br/>docs/PROVENANCE.md"])
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1.5px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,color:#F8FAFC
