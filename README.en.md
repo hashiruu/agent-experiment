@@ -6,6 +6,16 @@
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#requirements)
 
+> A research automation workflow that runs 24/7: it runs your experiments,
+> maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
+> up to date.
+
+Install the skill once, run one deploy command inside your project, and 26 rules
+of long-horizon working discipline, three record files, a monitoring guide and a
+task script that resumes after an interruption land in place. The rules come out
+of the work behind a real top-tier conference paper: a project that ran unattended
+for a long stretch, and every rule in here has a real incident behind it.
+
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops
 > and waits for you: whether a batch of results can be trusted, whether something
@@ -14,17 +24,6 @@
 > work that does not depend on it, so it never idles, but that one item stays stuck
 > until you come back. **Review `docs/TODO.md` at least every 4 hours**; `/loop` can
 > do the reminding, see [Monitoring a long run](#monitoring-a-long-run).
-
-> A research automation workflow that runs 24/7: it runs your experiments,
-> maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
-> up to date.
-
-Install the skill once, run one deploy command inside your project, and 26 rules
-of long-horizon working discipline, three record files, a long-run monitoring
-guide and a task script that
-resumes after an interruption land in place. The rules come out of the work
-behind a real top-tier conference paper: a project that ran unattended for a long
-stretch, and every rule in here has a real incident behind it.
 
 ## Architecture
 
