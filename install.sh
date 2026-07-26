@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # =============================================================================
-# Install the agent-workflow skill.
+# 安装 agent-workflow skill。
 #
-#   ./install.sh              -> ~/.claude/skills/agent-workflow   (all projects)
-#   ./install.sh --project    -> ./.claude/skills/agent-workflow   (this repo only)
-#   ./install.sh --dir PATH   -> PATH/agent-workflow
+#   ./install.sh              -> ~/.claude/skills/agent-workflow   (对所有项目生效)
+#   ./install.sh --project    -> ./.claude/skills/agent-workflow   (只对当前仓库生效)
+#   ./install.sh --dir 路径   -> 路径/agent-workflow
 #
-# Works from a clone, and also standalone:
+# 从克隆下来的仓库里能跑, 直接单独拉这个脚本也能跑:
 #   curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
 # =============================================================================
 set -euo pipefail
@@ -16,58 +16,58 @@ SKILL_NAME="agent-workflow"
 DEST_ROOT="$HOME/.claude/skills"
 TMP=""
 
-die() { echo "error: $*" >&2; exit 1; }
+die() { echo "错误: $*" >&2; exit 1; }
 cleanup() { [ -n "$TMP" ] && rm -rf "$TMP" || true; }
 trap cleanup EXIT
 
 while [ $# -gt 0 ]; do
     case $1 in
         --project) DEST_ROOT="$PWD/.claude/skills"; shift ;;
-        --dir)     DEST_ROOT=${2:?--dir needs a path}; shift 2 ;;
+        --dir)     DEST_ROOT=${2:?--dir 需要一个路径}; shift 2 ;;
         -h|--help) sed -n '2,12p' "$0"; exit 0 ;;
-        *)         die "unknown argument: $1" ;;
+        *)         die "无法识别的参数: $1" ;;
     esac
 done
 
-# --- locate the skill source: local clone, else fetch -----------------------
+# --- 找 skill 源: 优先用本地克隆, 否则去拉 -----------------------------------
 HERE=$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" 2>/dev/null && pwd || echo "")
 SRC=""
 if [ -n "$HERE" ] && [ -f "$HERE/skills/$SKILL_NAME/SKILL.md" ]; then
     SRC="$HERE/skills/$SKILL_NAME"
 else
-    command -v git >/dev/null 2>&1 || die "git not found — clone the repo manually and run ./install.sh"
-    echo "fetching $REPO_URL ..."
+    command -v git >/dev/null 2>&1 || die "找不到 git —— 手动克隆仓库后再跑 ./install.sh"
+    echo "正在拉取 $REPO_URL ..."
     TMP=$(mktemp -d)
-    git clone --depth 1 --quiet "$REPO_URL" "$TMP/repo" || die "clone failed"
+    git clone --depth 1 --quiet "$REPO_URL" "$TMP/repo" || die "克隆失败"
     SRC="$TMP/repo/skills/$SKILL_NAME"
 fi
-[ -f "$SRC/SKILL.md" ] || die "SKILL.md not found in $SRC"
+[ -f "$SRC/SKILL.md" ] || die "$SRC 里找不到 SKILL.md"
 
-# --- install ----------------------------------------------------------------
+# --- 安装 --------------------------------------------------------------------
 DEST="$DEST_ROOT/$SKILL_NAME"
 mkdir -p "$DEST_ROOT"
-[ -d "$DEST" ] && echo "replacing existing install at $DEST" || true
+[ -d "$DEST" ] && echo "覆盖已有安装: $DEST" || true
 rm -rf "$DEST"
 cp -R "$SRC" "$DEST"
 chmod +x "$DEST/deploy.sh" "$DEST/assets/scaffold/run_task.sh"
 
-# --- verify -----------------------------------------------------------------
+# --- 校验 --------------------------------------------------------------------
 for f in SKILL.md deploy.sh assets/CLAUDE.md assets/gitignore.snippet \
          assets/scaffold/RULES.md assets/scaffold/TODO.md \
          assets/scaffold/PROVENANCE.md assets/scaffold/run_task.sh; do
-    [ -f "$DEST/$f" ] || die "install incomplete: missing $f"
+    [ -f "$DEST/$f" ] || die "安装不完整: 缺少 $f"
 done
-bash -n "$DEST/deploy.sh" || die "deploy.sh failed its syntax check"
+bash -n "$DEST/deploy.sh" || die "deploy.sh 语法检查未通过"
 
 cat <<EOF
 
-installed: $DEST
+已安装: $DEST
 
-next:
-  1. restart Claude Code (skills are picked up at session start)
-  2. in the project you want to set up, ask for the skill by name:
+下一步:
+  1. 重启 Claude Code (skill 在会话启动时才被发现)
+  2. 在要设置的项目里点名调用:
        /agent-workflow
-     or just: "set up the long-task workflow in this project"
-  3. or run it directly:
+     或者直接说: "给这个项目装上长任务工作流"
+  3. 也可以手动跑:
        bash $DEST/deploy.sh --dry-run
 EOF
