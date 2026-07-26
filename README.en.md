@@ -18,7 +18,7 @@ for a long stretch, and every rule in here has a real incident behind it.
 
 **Use it for**: automated workflows · SOTA baselines side by side · repeated runs across seeds and configs.
 
-**Every real run leaves behind**: its own pipeline directory, a snapshot of the code as it was at launch, the full log, the weights and the metric, and a completion marker written only after everything succeeded — under 26 rules that were each paid for by a real incident.
+**Every real run leaves behind**: its own pipeline directory, a snapshot of the code as it was at launch, the full log, the weights and the metric, and a completion marker written only after everything succeeded, under 26 rules drawn from real incidents.
 
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops
