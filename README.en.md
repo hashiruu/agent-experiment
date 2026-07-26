@@ -32,23 +32,30 @@ stretch, and every rule in here has a real incident behind it.
 flowchart LR
     subgraph LOOP["Agent, 24/7 loop"]
         direction TB
-        T1["take the next item · docs/TODO.md"]
+        T1["take the next item<br/>docs/TODO.md"]
         D{"key decision?"}
-        T2["run it + watch it · run_task.sh · monitoring.md"]
-        T3["write it down · evidence / incident / tick off"]
+        T2["run it + watch it<br/>run_task.sh · monitoring.md"]
+        PV["leave evidence<br/>docs/PROVENANCE.md"]
+        RL["log the incident<br/>docs/RULES.md"]
+        TD["update the queue<br/>docs/TODO.md"]
         T1 --> D
         D -->|"no · on its own"| T2
-        T2 --> T3
-        T3 -->|"next round"| T1
+        T2 --> PV
+        T2 --> RL
+        T2 --> TD
+        PV --> T1
+        RL --> T1
+        TD -->|"next round"| T1
         D -->|"meanwhile take one that does not depend on it"| T1
     end
-    D <-->|"yes · parked as blocked, waiting on you"| HU(["you"])
-    T3 ==>|"review the queue every 4h"| HU
+    D -->|"yes · parked as blocked, waiting on you"| HU(["you"])
+    HU -->|"decision made · back on the queue"| T1
+    TD ==>|"review the queue every 4h"| HU
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,T3 step
+    class T1,T2,PV,RL,TD step
     class D gate
     class HU human
     style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
