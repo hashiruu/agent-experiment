@@ -1,20 +1,203 @@
 # agent-workflow
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
+[![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#前置条件)
+
 简体中文 · [English](README.en.md)
 
 > 一个 7 × 24 小时不间断运行，帮你跑实验、用 Git 维护公开仓库、更新 LaTeX（Overleaf）论文的科研自动化工作流。
 
-三件事同时在转：实验在跑，仓库在推，论文在改。人只在决策点出现。
+两步：装 skill，然后在项目里跑一次部署。落地的是 26 条长任务工作纪律、三份台账、一个能断点续跑的任务骨架。
+规则不是编的，是一个长期无人值守运行的真实项目里踩出来的。
 
-这种活最贵的失败从来不是代码写错，是记账出错。上一轮的完成标记被当成这一轮的；两条链同时往一个目录里写；
-表格数字换了，讨论它的正文没换；`git push` 悄悄失败了，没人发现。它们有个共同点：
-出事的时候没人在场。等发现，已经隔了很久，中间那几十个小时全白跑。
+给谁用：让 agent 挂着跑几天几周的人。实验在跑，仓库在推，论文在改，人只在决策点出现。
 
-这个仓库就是一个 Claude Code Skill：一条命令，把这套纪律装进任意项目。
+## 快速开始
 
-## 实战
+```bash
+git clone https://github.com/hashiruu/agent-workflow-template.git
+cd agent-workflow-template
+./install.sh                 # 装到 ~/.claude/skills/agent-workflow
+```
 
-原本按月算的工作量，压进了一周。排队不停、断点续跑、结果一出立刻落地，7 天做完的量接近过去半年。
+不想克隆：
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
+```
+
+装完重启 Claude Code。skill 在会话启动时才会被加载，不重启看不见。
+
+然后在要设置的项目里：
+
+```
+/agent-workflow
+```
+
+或者直接说"给这个项目装上长任务工作流"。skill 会自己判断该用哪几层，拿不准会问你，然后调部署脚本。
+
+**不用 Claude Code**：跳过上面这步，直接在项目根目录跑
+`bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run` 看一眼，再去掉 `--dry-run` 落地。
+
+## 它会往项目里放什么
+
+下面是在一个**空项目**里预览的样子（已有 `CLAUDE.md` 的话第一行会变成"追加"）：
+
+```console
+$ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
+  [dry-run] 新建   CLAUDE.md            (层: l1,l2,l3)
+  [dry-run] 新建   docs/RULES.md
+  [dry-run] 新建   docs/TODO.md
+  [dry-run] 新建   docs/PROVENANCE.md
+  [dry-run] 新建   scripts/run_task.sh
+  [dry-run] 追加   .gitignore
+
+完成 —— 目标: /path/to/your/project
+(预览模式: 什么都没写)
+下一步: 在看到任何结果之前, 先把 docs/PROVENANCE.md 的判据填掉。
+```
+
+| 文件 | 干什么的 | 重跑会不会被覆盖 |
+|---|---|---|
+| `CLAUDE.md` | 规则本体，写在托管块里 | 只刷新托管块，块外你自己写的内容不动 |
+| `docs/RULES.md` | 本项目特有的踩坑记录，边跑边追加 | 不会 |
+| `docs/TODO.md` | FIFO 队列 + 阻塞项 + 已取消项 | 不会 |
+| `docs/PROVENANCE.md` | 数字 → 权重 + 代码 + 日志，以及判据 | 不会 |
+| `scripts/run_task.sh` | 任务骨架：断点续跑、旧标记防误判、失败标记 | 不会 |
+| `.gitignore` | 实验产物、断点戳、LaTeX 中间文件 | 只追加一次 |
+
+`docs/` 和 `scripts/` 下那四份文件一旦建成就归项目自己所有，真要覆盖得加 `--force`。
+
+`run_task.sh` 把自己所在的目录当成运行根，只写相对路径，所以日志、结果、断点戳都落在 `scripts/` 下面。
+这是有意的，绝不写全局路径（见 L2 第 14 条）。想让产物去别处，把脚本挪个位置就行。
+
+## 三层规则
+
+规则按适用范围分层，免得一个纯前端项目也被灌一堆 GPU 建议。
+
+**编号是全局的 1–26，不是层内编号**：L1 是第 1–11 条，L2 是第 12–19 条，L3 是第 20–26 条。
+所以"L3 第 21 条"指的是全局第 21 条，不是 L3 里的第 21 条（L3 一共才 7 条）。
+丢掉某一层时编号不变，交叉引用不会错位。
+
+| 层 | 条数 | 什么时候留 | 举一条 |
+|---|---|---|---|
+| L1 通用 | 11 | 永远 | 绝不编辑正在被执行的脚本。bash 按字节偏移增量读取脚本，运行期间编辑会顶移后续字节，恢复执行时落在 token 中间 |
+| L2 计算实验 | 8 | 跑 GPU / 长批处理 | `CUDA_VISIBLE_DEVICES` 的值和 OOM 报错里的卡号都是可见索引，不是物理卡号；唯一可靠的是 `ls -l /proc/<pid>/fd \| grep nvidia` |
+| L3 论文写作 | 7 | LaTeX + 远程协作仓库 | 只信 `Output written ... (N pages)`。`.aux` 里最大的页码是最后一个浮动体落在哪页，不是文档总页数 |
+
+<details>
+<summary><b>26 条全列表</b>（点开看标题；完整正文在 <a href="skills/agent-workflow/assets/CLAUDE.md">assets/CLAUDE.md</a>，每条都附"怎么踩到的"）</summary>
+
+**L1 通用（1–11）**
+
+1. 绝不编辑正在被执行的脚本
+2. 完成标记必须带时间戳校验；失败路径绝不写完成标记
+3. 起任务前必须查已有队列，不能只看进程列表
+4. 加参数/改接口后必须通查所有引用点
+5. 改任何数字后，grep 全文搜每一个被替换掉的旧值
+6. 判断分布类指标前先确认样本量
+7. "两个数完全相等"必须回原始数据全精度重算
+8. 两点之差若同时涉及多个变量，只能提假设，不能下结论
+9. 判据先于数据
+10. 诊断成本超过收益时止损，并写下"从哪继续"
+11. 承认推翻，不要悄悄改
+
+**L2 计算实验（12–19）**
+
+12. GPU 编号有三套，只有一套可靠
+13. `nvidia-smi` 报错不等于卡坏
+14. 管线隔离：每个 run 独立目录 + 相对路径输出
+15. 阶段化脚本要让每一步能单独重跑
+16. 失败会杀死整条链，而计数看起来像"还在跑"
+17. 报告任何指标都要同时报平凡基线
+18. 先看中间产物，再解释最终指标
+19. baseline 调参的公平性协议（必须写死，不许事后回调）
+
+**L3 论文写作（20–26）**
+
+20. 远程仓库是多人协作的，推之前必须先拉（条文里还带推**之后**的一致性断言）
+21. 本地必须装 LaTeX，改完必须编译
+22. 只信编译器报的页数
+23. 改表格数字必须同时改讨论它的正文
+24. 每个图表必须紧邻讨论它的段落
+25. 可追溯性：每个对外数字要能指到三样东西
+26. 声明所有偏离
+
+</details>
+
+## run_task.sh 怎么用
+
+骨架本身不跑任何东西，你把每个阶段写成一行 `step`：
+
+```bash
+step 1_prepare  python code/prepare.py --out ./out_$TAG
+step 2_train    python code/train.py   --gpu "$GPU" --out ./results/$TAG
+
+T0=$(date +%s)
+step 3_eval     python code/eval.py    --weights ./results/$TAG/best.pth \
+                                       --out ./results/$TAG/RESULT.txt
+assert_fresh "./results/$TAG/RESULT.txt" "score=" "$T0"   # 存在 + 非空 + 含字段 + 是本轮产的
+```
+
+这几行填进 `scripts/run_task.sh` 的"任务主体"那一段，文件里有注释标出位置。
+然后 `./scripts/run_task.sh myrun 0`——第一个参数是 tag（脚本里的 `$TAG`，用来隔离本次的输出目录、
+日志和断点戳），第二个是 GPU 号（`$GPU`，不填默认 0）。它做四件事：
+
+- 每个 `step` 成功后在 `.stamps/` 落一个戳，中断重跑时已完成的步直接跳过；
+- 任何一步失败就写 `FAILED_<tag>` 并退出，**绝不写完成标记**；
+- 全部成功才写 `ALLDONE_<tag>`，里面记着起止时间和你要填的关键配置；
+- `assert_fresh` 确认产物是本轮产生的。只判断文件在不在的话，上一轮的残留会被当成新结果收下。
+
+长任务用 `setsid nohup ./scripts/run_task.sh myrun 0 &` 起，监控进程被杀不影响计算链。
+
+**改完代码怎么重跑某一步**：断点戳在 `scripts/.stamps/<tag>/` 下，一步一个文件。
+删掉对应的那个戳，那一步就会重跑；整条链重来就删掉整个目录。
+
+```bash
+rm scripts/.stamps/myrun/2_train      # 改了 train.py，重跑训练
+rm -rf scripts/.stamps/myrun          # 全部从头跑
+```
+
+这一步别忘：改了代码不删戳，脚本会安安静静跳过训练，把上一轮的权重当成新结果交给你——
+正是第 2 条最想防的那种"看起来成功了"。
+
+## 常用命令
+
+```bash
+bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run          # 先看会写什么
+bash ~/.claude/skills/agent-workflow/deploy.sh                    # 全部三层
+bash ~/.claude/skills/agent-workflow/deploy.sh --layers l1,l2     # 只要其中几层
+bash ~/.claude/skills/agent-workflow/deploy.sh --target ../其他   # 装到别处
+bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那四份文件一起覆盖
+```
+
+| 参数 | 默认 | 说明 |
+|---|---|---|
+| `--target 目录` | 当前目录 | 部署到哪个项目 |
+| `--layers l1,l2,l3` | 三层全上 | 要哪几层；层名写错会直接报错，不会静默产出空规则 |
+| `--dry-run` | 关 | 只打印会做什么，一个字节都不写 |
+| `--force` | 关 | 允许覆盖已存在的那四份文件（三份台账 + `run_task.sh`）|
+
+安装脚本：`--project` 装进**当前目录**的 `./.claude/skills/`，只对这个仓库生效，可以提交给团队共用。
+注意它看的是你敲命令时所在的目录，所以要在**你自己的项目根目录**下跑，用绝对路径调模板里的脚本：
+
+```bash
+cd ~/我的项目
+bash ~/克隆下来的/agent-workflow-template/install.sh --project
+```
+
+`--dir 路径` 则装到你指定的任意位置。
+
+## 实战：这套纪律换来了什么
+
+排队不停、断点续跑、结果一出立刻落地，7 天做完的量接近过去半年。
+
+先说清口径，免得当 benchmark 读：这是作者自述的前后对比，没有对照组，"工作量"指实验批次
+加论文修订轮次，不是任何单一指标。而且要分清两件事——**速度是"挂机不停"换来的**，
+不用守着机器、崩了不用从头重跑、结果不用攒到周末，这是任何 7×24 自动化都有的收益；
+**这 26 条规则换来的是那些产出可信**，而不是又一轮"跑完发现标记是上一轮的、数字和正文对不上"。
+没有规则的挂机，只是把出错速度也一起提上去了。你自己的倍数取决于你的任务有多经得起中断。
 
 下面每条都不是设想，是规则文件里真实记过的事故换来的：
 
@@ -32,78 +215,7 @@
 - 错误结论原地撤回，不悄悄删。一次基于 6 个样本的误判杀掉了一个配置完全正确的运行；
   那段撤回记录留在原地，没删。（L1 第 6 / 11 条）
 
-素材来自一个长期无人值守的真实项目。那里攒下约 800 行规则，经得起换项目的只有 26 条。
-本仓库装的就是这 26 条，加上让它们真正被执行的脚手架。
-
-## 安装
-
-```bash
-git clone https://github.com/hashiruu/agent-workflow-template.git
-cd agent-workflow-template
-./install.sh                    # 装到 ~/.claude/skills/agent-workflow
-```
-
-不想克隆：
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-workflow-template/main/install.sh | bash
-```
-
-装完重启 Claude Code。skill 在会话启动时才会被加载，不重启看不见。
-
-另外两个选项：`./install.sh --project` 装进当前目录的 `./.claude/skills/`，只对这个仓库生效，
-可以提交给团队共用；`./install.sh --dir 路径` 装到别的地方。
-
-## 使用
-
-在要设置的项目里：
-
-```
-/agent-workflow
-```
-
-或者直接说"给这个项目装上长任务工作流"。skill 会自己判断该用哪几层，然后调部署脚本。想手动开：
-
-```bash
-bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run          # 先看会写什么
-bash ~/.claude/skills/agent-workflow/deploy.sh                    # 全部三层
-bash ~/.claude/skills/agent-workflow/deploy.sh --layers l1,l2     # 只要其中几层
-bash ~/.claude/skills/agent-workflow/deploy.sh --target ../其他   # 装到别处
-```
-
-不用 Claude Code 也能用。`skills/agent-workflow/assets/` 里全是纯 Markdown 和 Bash，
-`deploy.sh` 可以独立跑，部署出来的 `CLAUDE.md` 喂给任何 agent 都行。
-
-## 部署下去的东西
-
-```
-CLAUDE.md            规则本体，写在托管块里，重跑即刷新
-docs/RULES.md        本项目特有的踩坑记录，边跑边追加
-docs/TODO.md         FIFO 队列 + 阻塞项 + 已取消项
-docs/PROVENANCE.md   数字 → 权重 + 代码 + 日志，以及判据
-scripts/run_task.sh  任务骨架：断点续跑、旧标记防误判、失败标记
-.gitignore           实验产物、断点戳、LaTeX 中间文件
-```
-
-重跑是安全的。归脚本管的只有 `CLAUDE.md` 里的托管块；四份台账一旦建成就永不覆盖，
-真要覆盖得加 `--force`。已经存在的 `CLAUDE.md` 内容不动，托管块追加在你的内容下面，
-以后重跑就在原地替换。
-
-`run_task.sh` 把自己所在的目录当成运行根，只写相对路径，所以日志、结果、断点戳都落在 `scripts/` 下面。
-这是有意的，绝不写全局路径（见 L2 第 14 条）。想让产物去别处，把脚本挪个位置就行。
-
-## 三层规则
-
-规则按适用范围分层，免得一个纯前端项目也被灌一堆 GPU 建议。
-丢掉某一层时规则编号不变，所以"见 L1 第 5 条"这类交叉引用不会错位。
-
-| 层 | 条数 | 什么时候留 | 举一条 |
-|---|---|---|---|
-| L1 通用 | 11 | 永远 | 绝不编辑正在被执行的脚本。bash 按字节偏移增量读取脚本，运行期间编辑会顶移后续字节，恢复执行时落在 token 中间 |
-| L2 计算实验 | 8 | 跑 GPU / 长批处理 | `CUDA_VISIBLE_DEVICES` 的值和 OOM 报错里的卡号都是可见索引，不是物理卡号；唯一可靠的是 `ls -l /proc/<pid>/fd \| grep nvidia` |
-| L3 论文写作 | 7 | LaTeX + 远程协作仓库 | 只信 `Output written ... (N pages)`。`.aux` 里最大的页码是最后一个浮动体落在哪页，不是文档总页数 |
-
-## 这套东西真正的价值
+## 设计原则
 
 条文会过期，可移植的是产生条文的机制：
 
@@ -115,6 +227,61 @@ scripts/run_task.sh  任务骨架：断点续跑、旧标记防误判、失败�
 
 第 2 条最反直觉。原项目的规则文件里留着一整段被撤回的结论：一次基于 6 个样本的误判，
 杀掉了一个配置完全正确的运行。留着这段撤回，比删干净重写有用得多。
+
+## 前置条件
+
+- **bash 3.2+**（macOS 自带的就是 3.2，够用）。用到了 `BASH_SOURCE` 和 `${var//,/ }`，`sh` 跑不了。
+- **awk / grep / sed / mktemp**，系统自带即可。
+- **git**：只有走 `curl | bash` 那条路才需要（脚本会自己克隆）。
+- **Claude Code**：可选。不用它也能跑 `deploy.sh`，见下面 FAQ。
+- **平台**：Linux。`install.sh` 和 `deploy.sh` 是可移植的，但骨架脚本 `run_task.sh` 有两行是 GNU 专属：
+  `assert_fresh()` 里的 `stat -c %Y`（BSD 上是 `stat -f %m`），和完成标记那行的 `date -d @$START`
+  （BSD 上是 `date -r $START`）。macOS 改这两行即可；装 Homebrew 的 coreutils 也行，
+  但它默认把命令装成 `gstat` / `gdate`，得把 `gnubin` 加进 PATH 才认 `stat -c`。Windows 走 WSL。
+
+## FAQ
+
+**项目里已经有 `CLAUDE.md`，会被覆盖吗？**
+不会。托管块追加在你的内容下面，以后重跑就在原地替换那一块，你写的部分一直不动。
+
+**能只装 L1 吗？装完还能再加层吗？**
+能。`--layers l1` 只装 11 条；之后想加，改参数重跑就行，托管块原地刷新。
+规则编号在任何组合下都不变，交叉引用不会错位。
+
+**台账写了一半，重跑会被清空吗？**
+不会。`docs/` 和 `scripts/` 下那四份文件一旦存在就永不覆盖，除非你自己加 `--force`。
+
+**不用 Claude Code 能用吗？**
+能。`skills/agent-workflow/assets/` 里全是纯 Markdown 和 Bash，`deploy.sh` 可以独立跑，
+部署出来的 `CLAUDE.md` 喂给任何 agent 都行。
+
+**怎么更新到新版本？**
+`git pull` 之后重跑 `./install.sh`，它会**整个替换掉**旧的 skill 目录——
+你要是改过 `~/.claude/skills/agent-workflow/assets/` 里的规则，先备份。
+项目里已经部署的内容不受影响，想同步规则就在项目里重跑一次 `deploy.sh`。
+
+**怎么卸载？**
+`rm -rf ~/.claude/skills/agent-workflow`。用 `--project` 装的就删 `./.claude/skills/agent-workflow`。
+项目里已经部署的文件是你的记录，删不删随你。想彻底去掉痕迹有两处：
+`CLAUDE.md` 里 `<!-- agent-workflow:begin ... -->` 到 `<!-- agent-workflow:end -->` 之间那段（连标记一起删），
+以及 `.gitignore` 末尾 `# --- agent-workflow ---` 那行往下的一段（脚本也是靠这行判断"已经追加过"的）。
+
+**用 `--project` 装的，命令路径怎么写？**
+把下文所有 `~/.claude/skills/agent-workflow/` 换成 `./.claude/skills/agent-workflow/`。
+
+**`curl | bash` 我不放心。**
+应该的。想先审就分两步：`curl -fsSL <url> -o install.sh`，看完再 `bash install.sh`。
+脚本干的事就三件：把 `skills/agent-workflow/` 拷到 skills 目录、`chmod +x`、校验文件齐不齐。
+真正会往你项目里写文件的是 `deploy.sh`，它有 `--dry-run`，写之前先看一眼。
+
+**它会不会自己 push、自己改我的代码？**
+分两层说，别混。**模板自己不会**：`deploy.sh` 只往你项目里写 6 个文件（其中会往 `.gitignore`
+末尾追加一段），不改 git 配置、不联网、不申请任何权限；唯一联网的是 `install.sh` 走
+`curl | bash` 时克隆本仓库；`run_task.sh` 要你自己往里填命令才会跑东西。
+
+**但 L3 那七条本来就是教 agent 怎么推仓库的**，这是它的用途，不是副作用。所以真正决定
+"半夜会不会有东西被推上去"的，是你怎么起 agent、给了它什么权限，不是这份模板。
+不想让它碰 Git 就别装 L3：`--layers l1` 或 `--layers l1,l2`。
 
 ## 几句实话
 
@@ -129,7 +296,7 @@ scripts/run_task.sh  任务骨架：断点续跑、旧标记防误判、失败�
 判断一条规则该不该进这里，标准很简单：换一个数据集、换一篇论文，它还成立吗？
 不成立的，留在它踩出来的地方。
 
-## 目录
+## 目录结构
 
 ```
 install.sh                       安装 skill
