@@ -26,30 +26,24 @@ flowchart LR
         direction TB
         T1["取下一件事<br/>docs/TODO.md"]
         D{"关键决策?"}
-        T2["起任务 + 盯崩溃<br/>scripts/run_task.sh<br/>docs/monitoring.md"]
-        PV["留证据<br/>docs/PROVENANCE.md"]
-        RL["回写踩坑<br/>docs/RULES.md"]
-        TD["更新队列<br/>docs/TODO.md"]
+        T2["起任务 + 盯崩溃<br/>run_task.sh · monitoring.md"]
+        T3["记一笔<br/>留证据 · 回写踩坑 · 勾掉队列"]
         T1 --> D
         D -->|"否 · 自行推进"| T2
-        T2 --> PV
-        T2 --> RL
-        T2 --> TD
-        PV --> T1
-        RL --> T1
-        TD --> T1
+        T2 --> T3
+        T3 -->|"进入下一轮"| T1
     end
-    D -->|"是 · 停下等你决策"| W["挂进 TODO 阻塞区<br/>写清在等谁的什么"]
-    W -->|"同时做不依赖它的下一件"| T1
+    D -->|"是 · 停下等你决策"| W["挂进 docs/TODO.md 阻塞区<br/>写清在等谁的什么、拿到后做什么"]
+    W -->|"同时去做队列里不依赖它的下一件"| T1
     W -.->|"这件事卡住了"| HU
-    HU(["你"]) -.->|"决策给出 · 入队"| T1
-    TD ==>|"每 4 小时复核队列"| HU
+    T3 ==>|"每 4 小时复核队列"| HU
+    HU(["你<br/>关键决策在这里"]) -.->|"决策给出 · 重新入队"| T1
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,PV,RL,TD step
+    class T1,T2,T3 step
     class D gate
     class W side
     class HU human

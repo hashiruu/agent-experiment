@@ -36,30 +36,24 @@ flowchart LR
         direction TB
         T1["take the next item<br/>docs/TODO.md"]
         D{"key decision?"}
-        T2["run it + watch it<br/>scripts/run_task.sh<br/>docs/monitoring.md"]
-        PV["leave evidence<br/>docs/PROVENANCE.md"]
-        RL["log the incident<br/>docs/RULES.md"]
-        TD["update the queue<br/>docs/TODO.md"]
+        T2["run it + watch it<br/>run_task.sh · monitoring.md"]
+        T3["write it down<br/>evidence · incident · tick off the queue"]
         T1 --> D
         D -->|"no · proceed on its own"| T2
-        T2 --> PV
-        T2 --> RL
-        T2 --> TD
-        PV --> T1
-        RL --> T1
-        TD --> T1
+        T2 --> T3
+        T3 -->|"next round"| T1
     end
-    D -->|"yes · stop and wait for you"| W["park it in TODO blocked<br/>who and what it waits on"]
+    D -->|"yes · stop and wait for you"| W["park it in docs/TODO.md blocked<br/>who and what it waits on, what happens next"]
     W -->|"meanwhile take one that does not depend on it"| T1
     W -.->|"this one is stuck"| HU
-    HU(["you"]) -.->|"decision made · back on the queue"| T1
-    TD ==>|"review the queue every 4h"| HU
+    T3 ==>|"review the queue every 4h"| HU
+    HU(["you<br/>key decisions live here"]) -.->|"decision made · back on the queue"| T1
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,PV,RL,TD step
+    class T1,T2,T3 step
     class D gate
     class W side
     class HU human
