@@ -1,0 +1,37 @@
+# 本模板自身不产出任何东西; 以下是**套用它的项目**通常该忽略的。
+# 复制模板时把这份也带过去, 按需增删。
+
+# 实验产物 —— 体积大且可重跑, 不进版本库
+results/
+out/
+runs/
+logs/
+*.pth
+*.ckpt
+*.npy
+*.pkl
+
+# 断点与状态标记 —— 属于某一次运行, 不属于代码
+.stamps/
+ALLDONE_*
+FAILED_*
+
+# LaTeX 中间产物
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# 环境
+__pycache__/
+*.py[cod]
+.venv/
+.ipynb_checkpoints/
+.DS_Store
+
+# ⚠️ 不要忽略这三份台账 —— 它们是可追溯性的载体, 必须进版本库:
+#   docs/RULES.md  docs/TODO.md  docs/PROVENANCE.md
