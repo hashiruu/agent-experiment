@@ -22,14 +22,11 @@
 > maintains your public repos through Git, and keeps your LaTeX (Overleaf) paper
 > up to date.
 
-Two steps: install the skill, then run one deployment inside your project. What
-lands there is 26 rules of long-horizon working discipline, three record files, and a
-task skeleton that resumes from checkpoints. The rules were not invented. They
-were paid for by a real project that ran unattended for a long stretch.
-
-Who it is for: people who leave an agent running for days or weeks. Experiments
-running, repos being pushed, the paper being revised, a human showing up only at
-decision points.
+Install the skill once, run one deploy command inside your project, and 26 rules
+of long-horizon working discipline, three record files and a task script that
+resumes after an interruption land in place. The rules were not invented. They
+come out of the work behind a real top-tier conference paper, produced by a
+project that ran unattended for a long stretch, one incident at a time.
 
 ## Quick start
 
@@ -57,9 +54,27 @@ Then, in the project you want to set up:
 or just say "set up the long-task workflow in this project". The skill works out
 which layers apply, asks you when it is unsure, and calls the deploy script.
 
-**Without Claude Code**: skip that step. In the project root, run
-`bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run` to see what would
-happen, then drop `--dry-run`.
+### With Codex, Gemini CLI or any other agent
+
+Claude Code is not required. Everything under `skills/agent-workflow/assets/` is
+plain Markdown and Bash, and the deploy script runs on its own:
+
+```bash
+cd your-project
+bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run   # see what it would write
+bash ~/.claude/skills/agent-workflow/deploy.sh             # write it
+```
+
+Different agents look for different filenames. The script writes `CLAUDE.md`, so
+symlink it and both stay in sync:
+
+```bash
+ln -s CLAUDE.md AGENTS.md     # Codex
+ln -s CLAUDE.md GEMINI.md     # Gemini CLI
+```
+
+Same idea elsewhere: point whatever file your tool reads at `CLAUDE.md`, or just
+copy the contents across.
 
 ## What it puts in your project
 
@@ -307,9 +322,7 @@ No. The four files under `docs/` and `scripts/` are never overwritten once they
 exist, unless you pass `--force` yourself.
 
 **Can I use this without Claude Code?**
-Yes. Everything under `skills/agent-workflow/assets/` is plain Markdown and Bash,
-`deploy.sh` runs standalone, and the `CLAUDE.md` it produces can be handed to any
-agent.
+Yes, see [With Codex, Gemini CLI or any other agent](#with-codex-gemini-cli-or-any-other-agent) above.
 
 **How do I update?**
 `git pull`, then re-run `./install.sh`, which **replaces the whole skill

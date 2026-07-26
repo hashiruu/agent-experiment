@@ -17,10 +17,9 @@
 
 > 一个 7 × 24 小时不间断运行，帮你跑实验、用 Git 维护公开仓库、更新 LaTeX（Overleaf）论文的科研自动化工作流。
 
-两步：装 skill，然后在项目里跑一次部署。落地的是 26 条长任务工作纪律、三份记录文件、一个能断点续跑的任务骨架。
-规则不是编的，是一个长期无人值守运行的真实项目里踩出来的。
-
-给谁用：让 agent 挂着跑几天几周的人。实验在跑，仓库在推，论文在改，人只在决策点出现。
+你只需要装一次 skill，然后在项目里运行一条部署命令，26 条长任务工作纪律、三份记录文件、
+一个中断能接着跑的任务脚本就会自动落到位。规则不是编的——它们来自一篇真实产出的顶会论文，
+那个项目长期无人值守地跑，这些规则是一条条踩出来的。
 
 ## 快速开始
 
@@ -46,8 +45,24 @@ curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/ma
 
 或者直接说"给这个项目装上长任务工作流"。skill 会自己判断该用哪几层，拿不准会问你，然后调部署脚本。
 
-**不用 Claude Code**：跳过上面这步，直接在项目根目录跑
-`bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run` 看一眼，再去掉 `--dry-run` 落地。
+### 用 Codex、Gemini CLI 或别的 agent
+
+不依赖 Claude Code。`skills/agent-workflow/assets/` 里全是纯 Markdown 和 Bash，部署脚本单独就能跑：
+
+```bash
+cd 你的项目
+bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run   # 先看会写什么
+bash ~/.claude/skills/agent-workflow/deploy.sh             # 落地
+```
+
+不同 agent 认的规则文件名不一样，脚本产出的是 `CLAUDE.md`，做个软链就行——内容是同一份，改一处两边都变：
+
+```bash
+ln -s CLAUDE.md AGENTS.md     # Codex
+ln -s CLAUDE.md GEMINI.md     # Gemini CLI
+```
+
+其他工具同理：把它读的那个文件指向 `CLAUDE.md`，或者直接把内容拷过去。
 
 ## 它会往项目里放什么
 
@@ -257,8 +272,7 @@ bash ~/克隆下来的/agent-research-workflow/install.sh --project
 不会。`docs/` 和 `scripts/` 下那四份文件一旦存在就永不覆盖，除非你自己加 `--force`。
 
 **不用 Claude Code 能用吗？**
-能。`skills/agent-workflow/assets/` 里全是纯 Markdown 和 Bash，`deploy.sh` 可以独立跑，
-部署出来的 `CLAUDE.md` 喂给任何 agent 都行。
+能，见上面[用 Codex、Gemini CLI 或别的 agent](#用-codexgemini-cli-或别的-agent)。
 
 **怎么更新到新版本？**
 `git pull` 之后重跑 `./install.sh`，它会**整个替换掉**旧的 skill 目录——
