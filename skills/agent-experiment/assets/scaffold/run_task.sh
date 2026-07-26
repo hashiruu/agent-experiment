@@ -19,10 +19,23 @@ GPU=${2:-0}
 START=$(date +%s)
 LOG="logs/$TAG.log"
 STAMP=".stamps/$TAG"
-mkdir -p logs results "$STAMP"
+RUN_DIR="results/$TAG"
+# 要快照哪个代码目录。本脚本以自身所在目录为运行根, 所以项目根是 ".."
+# 覆盖方式: CODE_SRC=../mycode ./scripts/run_task.sh mytag
+if [ -z "${CODE_SRC:-}" ]; then
+    for c in ../code ../src code src; do [ -d "$c" ] && CODE_SRC=$c && break; done
+fi
+CODE_SRC=${CODE_SRC:-../code}
+mkdir -p logs "$RUN_DIR" "$STAMP"
 
 # 起新批次先清掉上一轮的标记, 否则监控会认旧标记  [规则 2]
 rm -f "ALLDONE_$TAG" "FAILED_$TAG"
+
+# 代码快照: 每个 run 存一份当时的代码, 事后能回答"这个权重是哪份代码跑出来的"  [规则 14/25]
+# 只在首次建立, 续跑不覆盖 —— 否则续跑用的代码和前半程就不是同一份了
+if [ -d "$CODE_SRC" ] && [ ! -d "$RUN_DIR/code" ]; then
+    cp -R "$CODE_SRC" "$RUN_DIR/code"
+fi
 
 say()  { echo "[$(date '+%F %T')] $*" | tee -a "$LOG"; }
 fail() { say "FAILED at: $*"; { date '+%F %T'; echo "step: $*"; } > "FAILED_$TAG"; exit 1; }
@@ -48,6 +61,8 @@ step() {           # $1=步骤名  $2...=要执行的命令
 
 # ------------------------------- 任务主体 -------------------------------
 say "=== $TAG 开始  gpu=$GPU  pid=$$"
+[ -d "$RUN_DIR/code" ] && say "    代码快照: $CODE_SRC -> $RUN_DIR/code" \
+    || say "    未找到代码目录($CODE_SRC), 跳过快照; 要指定就设 CODE_SRC=<路径>"
 
 # 示例: 把每一步写成 step "<名字>" <命令...>
 # step 1_prepare  python code/prepare.py --out ./out_$TAG
@@ -62,6 +77,7 @@ say "=== $TAG 开始  gpu=$GPU  pid=$$"
 # 只有走到这里才算全部成功  [规则 2]
 { echo "tag=$TAG  gpu=$GPU  started=$(date -d @$START '+%F %T')"
   echo "finished=$(date '+%F %T')  elapsed_min=$(( ($(date +%s)-START)/60 ))"
+  echo "code_snapshot=$RUN_DIR/code   log=$LOG"
   echo "# 在此逐行写下本次的关键配置与结果, 供事后核对声明与实际是否一致"
 } > "ALLDONE_$TAG"
 say "=== $TAG 完成"

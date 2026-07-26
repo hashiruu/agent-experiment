@@ -264,6 +264,41 @@ Do not skip this. Change the code without deleting the stamp and the script
 quietly skips training, then hands you last round's weights as a fresh result,
 which is exactly the "it looked like it succeeded" failure rule 2 exists to prevent.
 
+### What one experiment leaves behind
+
+One tag is one isolated pipeline. Ten experiments means ten of them, none in each
+other's way:
+
+```
+results/<tag>/
+  code/          snapshot of the code taken at launch, not overwritten on resume
+  best.pth       whatever weights your step writes
+  RESULT.txt     the metric
+logs/<tag>.log   the full log for this chain
+.stamps/<tag>/   one stamp per step, this is what resuming reads
+ALLDONE_<tag>    written only on full success: start/end time, snapshot path, log path
+```
+
+Four things the script guarantees:
+
+1. **Its own pipeline.** Output, logs and stamps are all keyed by tag, so two chains
+   running at once never write the same file.
+2. **Its own copy of the code.** The code directory is copied into
+   `results/<tag>/code` at launch. Three months later you can open the exact code
+   that produced those weights, not the version rewritten eight times since. A
+   resume does not re-copy, or the second half of the run would use different code
+   from the first.
+3. **Relative output paths.** The script only writes paths relative to its own
+   directory, never a global one. A global path overwrites someone else's artifacts
+   and quietly makes "this row came from the same source as the rest" untrue.
+4. **The artifacts that go with it.** Weights, log, metric and completion marker all
+   land together, which is what lets every number in `docs/PROVENANCE.md` point back
+   at weights, code and log.
+
+The code directory is looked up as `../code` → `../src` → `code` → `src`. Point it
+somewhere else with `CODE_SRC=../mycode ./scripts/run_task.sh mytag`.
+
+
 ## Commands
 
 ```bash
