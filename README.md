@@ -1,4 +1,4 @@
-# agent-workflow
+# Agents Experiment
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-2563EB)](README.md)
 [![English](https://img.shields.io/badge/docs-English-64748B)](README.en.md)
@@ -53,15 +53,15 @@ flowchart LR
 ## 快速开始
 
 ```bash
-git clone https://github.com/hashiruu/agent-research-workflow.git
-cd agent-research-workflow
-./install.sh                 # 装到 ~/.claude/skills/agent-workflow
+git clone https://github.com/hashiruu/agents-experiment.git
+cd agents-experiment
+./install.sh                 # 装到 ~/.claude/skills/agents-experiment
 ```
 
 不想克隆：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hashiruu/agents-experiment/main/install.sh | bash
 ```
 
 装完重启 Claude Code。skill 在会话启动时才会被加载，不重启看不见。
@@ -69,19 +69,19 @@ curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-research-workflow/ma
 然后在要设置的项目里：
 
 ```
-/agent-workflow
+/agents-experiment
 ```
 
 或者直接说"给这个项目装上长任务工作流"。skill 会自己判断该用哪几层，拿不准会问你，然后调部署脚本。
 
 ### 用 Codex、Gemini CLI 或别的 agent
 
-不依赖 Claude Code。`skills/agent-workflow/assets/` 里全是纯 Markdown 和 Bash，部署脚本单独就能跑：
+不依赖 Claude Code。`skills/agents-experiment/assets/` 里全是纯 Markdown 和 Bash，部署脚本单独就能跑：
 
 ```bash
 cd 你的项目
-bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run   # 先看会写什么
-bash ~/.claude/skills/agent-workflow/deploy.sh             # 落地
+bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run   # 先看会写什么
+bash ~/.claude/skills/agents-experiment/deploy.sh             # 落地
 ```
 
 不同 agent 认的规则文件名不一样，脚本产出的是 `CLAUDE.md`，做个软链就行——内容是同一份，改一处两边都变：
@@ -98,7 +98,7 @@ ln -s CLAUDE.md GEMINI.md     # Gemini CLI
 下面是在一个**空项目**里预览的样子（已有 `CLAUDE.md` 的话第一行会变成"追加"）：
 
 ```console
-$ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
+$ bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run
   [dry-run] 新建   CLAUDE.md            (层: l1,l2,l3)
   [dry-run] 新建   docs/RULES.md
   [dry-run] 新建   docs/TODO.md
@@ -142,7 +142,7 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
 | L3 论文写作 | 7 | LaTeX + 远程协作仓库 | 只信 `Output written ... (N pages)`。`.aux` 里最大的页码是最后一个浮动体落在哪页，不是文档总页数 |
 
 <details>
-<summary><b>26 条全列表</b>（点开看标题；完整正文在 <a href="skills/agent-workflow/assets/CLAUDE.md">assets/CLAUDE.md</a>，每条都附"怎么踩到的"）</summary>
+<summary><b>26 条全列表</b>（点开看标题；完整正文在 <a href="skills/agents-experiment/assets/CLAUDE.md">assets/CLAUDE.md</a>，每条都附"怎么踩到的"）</summary>
 
 **L1 通用（1–11）**
 
@@ -199,7 +199,7 @@ $ bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run
   仍在轮询，**空转了 1 天 20 小时**才被发现——它不报错、不占资源、也不会自己退出。
 
 剩下的四条（事件去重、触发后立刻补挂、多 watcher 错开阈值、轮询间隔怎么定）见
-[`docs/monitoring.md`](skills/agent-workflow/assets/practices/monitoring.md)。
+[`docs/monitoring.md`](skills/agents-experiment/assets/practices/monitoring.md)。
 
 ### 让 Claude Code 定时替你盯
 
@@ -251,11 +251,11 @@ rm -rf scripts/.stamps/myrun          # 全部从头跑
 ## 常用命令
 
 ```bash
-bash ~/.claude/skills/agent-workflow/deploy.sh --dry-run          # 先看会写什么
-bash ~/.claude/skills/agent-workflow/deploy.sh                    # 全部三层
-bash ~/.claude/skills/agent-workflow/deploy.sh --layers l1,l2     # 只要其中几层
-bash ~/.claude/skills/agent-workflow/deploy.sh --target ../其他   # 装到别处
-bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那五份文件一起覆盖
+bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run          # 先看会写什么
+bash ~/.claude/skills/agents-experiment/deploy.sh                    # 全部三层
+bash ~/.claude/skills/agents-experiment/deploy.sh --layers l1,l2     # 只要其中几层
+bash ~/.claude/skills/agents-experiment/deploy.sh --target ../其他   # 装到别处
+bash ~/.claude/skills/agents-experiment/deploy.sh --force            # 连那五份文件一起覆盖
 ```
 
 | 参数 | 默认 | 说明 |
@@ -270,7 +270,7 @@ bash ~/.claude/skills/agent-workflow/deploy.sh --force            # 连那五份
 
 ```bash
 cd ~/我的项目
-bash ~/克隆下来的/agent-research-workflow/install.sh --project
+bash ~/克隆下来的/agents-experiment/install.sh --project
 ```
 
 `--dir 路径` 则装到你指定的任意位置。
@@ -338,21 +338,21 @@ bash ~/克隆下来的/agent-research-workflow/install.sh --project
 
 **怎么更新到新版本？**
 `git pull` 之后重跑 `./install.sh`，它会**整个替换掉**旧的 skill 目录——
-你要是改过 `~/.claude/skills/agent-workflow/assets/` 里的规则，先备份。
+你要是改过 `~/.claude/skills/agents-experiment/assets/` 里的规则，先备份。
 项目里已经部署的内容不受影响，想同步规则就在项目里重跑一次 `deploy.sh`。
 
 **怎么卸载？**
-`rm -rf ~/.claude/skills/agent-workflow`。用 `--project` 装的就删 `./.claude/skills/agent-workflow`。
+`rm -rf ~/.claude/skills/agents-experiment`。用 `--project` 装的就删 `./.claude/skills/agents-experiment`。
 项目里已经部署的文件是你的记录，删不删随你。想彻底去掉痕迹有两处：
-`CLAUDE.md` 里 `<!-- agent-workflow:begin ... -->` 到 `<!-- agent-workflow:end -->` 之间那段（连标记一起删），
-以及 `.gitignore` 末尾 `# --- agent-workflow ---` 那行往下的一段（脚本也是靠这行判断"已经追加过"的）。
+`CLAUDE.md` 里 `<!-- agents-experiment:begin ... -->` 到 `<!-- agents-experiment:end -->` 之间那段（连标记一起删），
+以及 `.gitignore` 末尾 `# --- agents-experiment ---` 那行往下的一段（脚本也是靠这行判断"已经追加过"的）。
 
 **用 `--project` 装的，命令路径怎么写？**
-把下文所有 `~/.claude/skills/agent-workflow/` 换成 `./.claude/skills/agent-workflow/`。
+把下文所有 `~/.claude/skills/agents-experiment/` 换成 `./.claude/skills/agents-experiment/`。
 
 **`curl | bash` 我不放心。**
 应该的。想先审就分两步：`curl -fsSL <url> -o install.sh`，看完再 `bash install.sh`。
-脚本干的事就三件：把 `skills/agent-workflow/` 拷到 skills 目录、`chmod +x`、校验文件齐不齐。
+脚本干的事就三件：把 `skills/agents-experiment/` 拷到 skills 目录、`chmod +x`、校验文件齐不齐。
 真正会往你项目里写文件的是 `deploy.sh`，它有 `--dry-run`，写之前先看一眼。
 
 **它会不会自己 push、自己改我的代码？**
@@ -382,7 +382,7 @@ bash ~/克隆下来的/agent-research-workflow/install.sh --project
 
 ```
 install.sh                       安装 skill
-skills/agent-workflow/
+skills/agents-experiment/
   SKILL.md                       入口：何时部署、选哪几层
   deploy.sh                      部署脚本，可重复跑 + 分层过滤
   assets/
