@@ -20,33 +20,29 @@
 ## 架构展示
 
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph LOOP["Agent 7×24 循环"]
-        direction TB
-        T1["取下一件事<br/>docs/TODO.md"]
+        Q["TODO 队列<br/>docs/TODO.md<br/>取下一件 · 做完勾掉"]
         D{"关键决策?"}
         T2["起任务 + 盯崩溃<br/>run_task.sh · monitoring.md"]
         PV["留证据<br/>docs/PROVENANCE.md"]
         RL["回写踩坑<br/>docs/RULES.md"]
-        TD["更新队列<br/>docs/TODO.md"]
-        T1 --> D
+        Q --> D
         D -->|"否 · 自行推进"| T2
         T2 --> PV
         T2 --> RL
-        T2 --> TD
-        PV --> T1
-        RL --> T1
-        TD -->|"进入下一轮"| T1
-        D -->|"同时做不依赖它的下一件"| T1
+        PV --> Q
+        RL --> Q
+        D -->|"同时做不依赖它的下一件"| Q
     end
     D -->|"是 · 挂进阻塞区，等你决策"| HU(["你"])
-    HU -->|"决策给出 · 重新入队"| T1
-    TD ==>|"每 4h 复核队列"| HU
+    HU -->|"决策给出 · 重新入队"| Q
+    Q ==>|"每 4h 复核队列"| HU
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
-    class T1,T2,PV,RL,TD step
+    class Q,T2,PV,RL step
     class D gate
     class HU human
     style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
