@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =============================================================================
-# agents-experiment —— 把长任务工作纪律部署进一个项目。
+# agent-experiment —— 把长任务工作纪律部署进一个项目。
 #
 #   ./deploy.sh [--target 目录] [--layers l1,l2,l3] [--force] [--dry-run]
 #
@@ -26,8 +26,8 @@ LAYERS="l1,l2,l3"
 FORCE=0
 DRY=0
 
-BEGIN_MARK="<!-- agents-experiment:begin — managed block, re-run the skill to update -->"
-END_MARK="<!-- agents-experiment:end -->"
+BEGIN_MARK="<!-- agent-experiment:begin — managed block, re-run the skill to update -->"
+END_MARK="<!-- agent-experiment:end -->"
 
 die() { echo "错误: $*" >&2; exit 1; }
 
@@ -110,9 +110,9 @@ place "$ASSETS/scaffold/run_task.sh"   "$TARGET/scripts/run_task.sh" 755
 
 # --- 3. .gitignore ----------------------------------------------------------
 GI="$TARGET/.gitignore"
-GI_MARK="# --- agents-experiment ---"
+GI_MARK="# --- agent-experiment ---"
 if [ -f "$GI" ] && grep -qF "$GI_MARK" "$GI"; then
-    say "保留   .gitignore (agents-experiment 规则已存在)"
+    say "保留   .gitignore (agent-experiment 规则已存在)"
 else
     act "追加   .gitignore"
     if [ "$DRY" -eq 0 ]; then

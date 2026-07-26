@@ -1,5 +1,5 @@
 ---
-name: agents-experiment
+name: agent-experiment
 description: 用于给 7×24 小时不间断运行的科研自动化项目装上工作纪律：常驻实验队列、无人值守批处理、用 Git 维护的公开仓库、持续更新的 LaTeX/Overleaf 论文。用户说"装工作流""设置长任务纪律""加任务记录""setup the workflow"时用；长时间运行中出了事故、教训要当场记下来时也用。部署 CLAUDE.md 规则、三份记录文件（RULES / TODO / PROVENANCE）和可断点续跑的任务骨架。Use when setting up a 24/7 unattended research automation project - long-running experiment queues, Git-maintained public repos, continuously updated LaTeX/Overleaf papers.
 ---
 
@@ -24,13 +24,13 @@ description: 用于给 7×24 小时不间断运行的科研自动化项目装上
 
 ```bash
 # 在要设置的项目根目录下
-bash ~/.claude/skills/agents-experiment/deploy.sh
+bash ~/.claude/skills/agent-experiment/deploy.sh
 
 # 先预览
-bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run
+bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
 
 # 指定目标和层
-bash ~/.claude/skills/agents-experiment/deploy.sh --target /path/to/project --layers l1,l2
+bash ~/.claude/skills/agent-experiment/deploy.sh --target /path/to/project --layers l1,l2
 ```
 
 ### 选哪几层

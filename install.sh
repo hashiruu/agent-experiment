@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 # =============================================================================
-# 安装 agents-experiment skill。
+# 安装 agent-experiment skill。
 #
-#   ./install.sh              -> ~/.claude/skills/agents-experiment   (对所有项目生效)
-#   ./install.sh --project    -> ./.claude/skills/agents-experiment   (只对当前仓库生效)
-#   ./install.sh --dir 路径   -> 路径/agents-experiment
+#   ./install.sh              -> ~/.claude/skills/agent-experiment   (对所有项目生效)
+#   ./install.sh --project    -> ./.claude/skills/agent-experiment   (只对当前仓库生效)
+#   ./install.sh --dir 路径   -> 路径/agent-experiment
 #
 # 从克隆下来的仓库里能跑, 直接单独拉这个脚本也能跑:
-#   curl -fsSL https://raw.githubusercontent.com/hashiruu/agents-experiment/main/install.sh | bash
+#   curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 # =============================================================================
 set -euo pipefail
 
-REPO_URL="https://github.com/hashiruu/agents-experiment.git"
-SKILL_NAME="agents-experiment"
+REPO_URL="https://github.com/hashiruu/agent-experiment.git"
+SKILL_NAME="agent-experiment"
 DEST_ROOT="$HOME/.claude/skills"
 TMP=""
 
@@ -67,7 +67,7 @@ cat <<EOF
 下一步:
   1. 重启 Claude Code (skill 在会话启动时才被发现)
   2. 在要设置的项目里点名调用:
-       /agents-experiment
+       /agent-experiment
      或者直接说: "给这个项目装上长任务工作流"
   3. 也可以手动跑:
        bash $DEST/deploy.sh --dry-run

@@ -1,4 +1,4 @@
-# Agents Experiment
+# agent-experiment
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-64748B)](README.md)
 [![English](https://img.shields.io/badge/docs-English-2563EB)](README.en.md)
@@ -63,15 +63,15 @@ flowchart LR
 ## Quick start
 
 ```bash
-git clone https://github.com/hashiruu/agents-experiment.git
-cd agents-experiment
-./install.sh                 # -> ~/.claude/skills/agents-experiment
+git clone https://github.com/hashiruu/agent-experiment.git
+cd agent-experiment
+./install.sh                 # -> ~/.claude/skills/agent-experiment
 ```
 
 Without cloning:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/hashiruu/agents-experiment/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 ```
 
 Restart Claude Code afterwards. Skills are loaded at session start, so you will
@@ -80,7 +80,7 @@ not see it until you do.
 Then, in the project you want to set up:
 
 ```
-/agents-experiment
+/agent-experiment
 ```
 
 or just say "set up the long-task workflow in this project". The skill works out
@@ -88,13 +88,13 @@ which layers apply, asks you when it is unsure, and calls the deploy script.
 
 ### With Codex, Gemini CLI or any other agent
 
-Claude Code is not required. Everything under `skills/agents-experiment/assets/` is
+Claude Code is not required. Everything under `skills/agent-experiment/assets/` is
 plain Markdown and Bash, and the deploy script runs on its own:
 
 ```bash
 cd your-project
-bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run   # see what it would write
-bash ~/.claude/skills/agents-experiment/deploy.sh             # write it
+bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run   # see what it would write
+bash ~/.claude/skills/agent-experiment/deploy.sh             # write it
 ```
 
 Different agents look for different filenames. The script writes `CLAUDE.md`, so
@@ -114,7 +114,7 @@ Previewed here in an **empty project**; with an existing `CLAUDE.md` the first
 line becomes "append" instead.
 
 ```console
-$ bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run
+$ bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run
   [dry-run] 新建   CLAUDE.md            (层: l1,l2,l3)
   [dry-run] 新建   docs/RULES.md
   [dry-run] 新建   docs/TODO.md
@@ -163,7 +163,7 @@ Rules are tagged by scope, so a frontend project does not inherit GPU advice.
 | L3 writing | 7 | LaTeX + shared remote | Trust only `Output written ... (N pages)`. The largest page number in `.aux` is where the last float landed, not the length of the document |
 
 <details>
-<summary><b>All 26 rules</b> (titles only; full text with the "how it was hit" notes lives in <a href="skills/agents-experiment/assets/CLAUDE.md">assets/CLAUDE.md</a>, in Chinese)</summary>
+<summary><b>All 26 rules</b> (titles only; full text with the "how it was hit" notes lives in <a href="skills/agent-experiment/assets/CLAUDE.md">assets/CLAUDE.md</a>, in Chinese)</summary>
 
 **L1 general (1-11)**
 
@@ -230,7 +230,7 @@ exactly like "still running".
 
 The other four (event dedup, re-arming after a trigger, staggered thresholds,
 poll intervals) are in
-[`docs/monitoring.md`](skills/agents-experiment/assets/practices/monitoring.md).
+[`docs/monitoring.md`](skills/agent-experiment/assets/practices/monitoring.md).
 
 ### Let Claude Code do the checking on a timer
 
@@ -289,11 +289,11 @@ which is exactly the "it looked like it succeeded" failure rule 2 exists to prev
 ## Commands
 
 ```bash
-bash ~/.claude/skills/agents-experiment/deploy.sh --dry-run          # preview
-bash ~/.claude/skills/agents-experiment/deploy.sh                    # all layers
-bash ~/.claude/skills/agents-experiment/deploy.sh --layers l1,l2     # subset
-bash ~/.claude/skills/agents-experiment/deploy.sh --target ../other  # elsewhere
-bash ~/.claude/skills/agents-experiment/deploy.sh --force            # overwrite those five files too
+bash ~/.claude/skills/agent-experiment/deploy.sh --dry-run          # preview
+bash ~/.claude/skills/agent-experiment/deploy.sh                    # all layers
+bash ~/.claude/skills/agent-experiment/deploy.sh --layers l1,l2     # subset
+bash ~/.claude/skills/agent-experiment/deploy.sh --target ../other  # elsewhere
+bash ~/.claude/skills/agent-experiment/deploy.sh --force            # overwrite those five files too
 ```
 
 | Flag | Default | What it does |
@@ -310,7 +310,7 @@ by absolute path:
 
 ```bash
 cd ~/my-project
-bash ~/where-you-cloned/agents-experiment/install.sh --project
+bash ~/where-you-cloned/agent-experiment/install.sh --project
 ```
 
 `--dir PATH` installs wherever you point it.
@@ -404,26 +404,26 @@ Yes, see [With Codex, Gemini CLI or any other agent](#with-codex-gemini-cli-or-a
 **How do I update?**
 `git pull`, then re-run `./install.sh`, which **replaces the whole skill
 directory** - back up first if you edited the rules under
-`~/.claude/skills/agents-experiment/assets/`.
+`~/.claude/skills/agent-experiment/assets/`.
 Projects you already deployed into are unaffected; re-run `deploy.sh` there if you
 want the newer rules.
 
 **How do I uninstall?**
-`rm -rf ~/.claude/skills/agents-experiment`, or `./.claude/skills/agents-experiment` if
+`rm -rf ~/.claude/skills/agent-experiment`, or `./.claude/skills/agent-experiment` if
 you installed with `--project`. Files already deployed into a project are your
 records, so keep or delete them as you like. Removing every trace takes two
-edits: in `CLAUDE.md`, delete everything between `<!-- agents-experiment:begin ... -->`
-and `<!-- agents-experiment:end -->`, markers included; in `.gitignore`, delete the
-block starting at `# --- agents-experiment ---` (that line is also how the script
+edits: in `CLAUDE.md`, delete everything between `<!-- agent-experiment:begin ... -->`
+and `<!-- agent-experiment:end -->`, markers included; in `.gitignore`, delete the
+block starting at `# --- agent-experiment ---` (that line is also how the script
 knows it already appended).
 
 **I installed with `--project`. What path do the commands use?**
-Replace every `~/.claude/skills/agents-experiment/` below with
-`./.claude/skills/agents-experiment/`.
+Replace every `~/.claude/skills/agent-experiment/` below with
+`./.claude/skills/agent-experiment/`.
 
 **I do not trust `curl | bash`.**
 You should not. Split it: `curl -fsSL <url> -o install.sh`, read it, then
-`bash install.sh`. The script does three things: copy `skills/agents-experiment/`
+`bash install.sh`. The script does three things: copy `skills/agent-experiment/`
 into your skills directory, `chmod +x`, and verify nothing is missing. The script
 that writes into your project is `deploy.sh`, and it has `--dry-run`.
 
@@ -462,7 +462,7 @@ does it still hold? If not, it stays where it was learned.
 
 ```
 install.sh                       installs the skill
-skills/agents-experiment/
+skills/agent-experiment/
   SKILL.md                       entry point: when to deploy, which layers
   deploy.sh                      deployment script, safe to re-run, layer filtering
   assets/
