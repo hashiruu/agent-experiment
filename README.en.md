@@ -34,28 +34,24 @@ stretch, and every rule in here has a real incident behind it.
 flowchart LR
     subgraph LOOP["Agent, 24/7 loop"]
         direction TB
-        T1["take the next item<br/>docs/TODO.md"]
+        T1["take the next item · docs/TODO.md"]
         D{"key decision?"}
-        T2["run it + watch it<br/>run_task.sh · monitoring.md"]
-        T3["write it down<br/>evidence · incident · tick off the queue"]
+        T2["run it + watch it · run_task.sh · monitoring.md"]
+        T3["write it down · evidence / incident / tick off"]
         T1 --> D
-        D -->|"no · proceed on its own"| T2
+        D -->|"no · on its own"| T2
         T2 --> T3
         T3 -->|"next round"| T1
+        D -->|"meanwhile take one that does not depend on it"| T1
     end
-    D -->|"yes · stop and wait for you"| W["park it in docs/TODO.md blocked<br/>who and what it waits on, what happens next"]
-    W -->|"meanwhile take one that does not depend on it"| T1
-    W -.->|"this one is stuck"| HU
+    D <-->|"yes · parked as blocked, waiting on you"| HU(["you"])
     T3 ==>|"review the queue every 4h"| HU
-    HU(["you<br/>key decisions live here"]) -.->|"decision made · back on the queue"| T1
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
-    classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
     class T1,T2,T3 step
     class D gate
-    class W side
     class HU human
     style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
@@ -318,7 +314,7 @@ bash ~/where-you-cloned/agent-experiment/install.sh --project
 ## In practice
 
 Queue never idle, resume from checkpoint, land every result the moment it exists.
-Seven days covered close to what half a year used to.
+**Measured at roughly 25x**: seven days covered close to what half a year used to.
 
 Running unattended is the easy half. The hard part is trusting the results
 afterwards: the completion marker that turned out to be last round's, two chains

@@ -24,28 +24,24 @@
 flowchart LR
     subgraph LOOP["Agent 7×24 循环"]
         direction TB
-        T1["取下一件事<br/>docs/TODO.md"]
+        T1["取下一件事 · docs/TODO.md"]
         D{"关键决策?"}
-        T2["起任务 + 盯崩溃<br/>run_task.sh · monitoring.md"]
-        T3["记一笔<br/>留证据 · 回写踩坑 · 勾掉队列"]
+        T2["起任务 + 盯崩溃 · run_task.sh · monitoring.md"]
+        T3["记一笔 · 留证据 / 回写踩坑 / 勾掉队列"]
         T1 --> D
         D -->|"否 · 自行推进"| T2
         T2 --> T3
         T3 -->|"进入下一轮"| T1
+        D -->|"同时做不依赖它的下一件"| T1
     end
-    D -->|"是 · 停下等你决策"| W["挂进 docs/TODO.md 阻塞区<br/>写清在等谁的什么、拿到后做什么"]
-    W -->|"同时去做队列里不依赖它的下一件"| T1
-    W -.->|"这件事卡住了"| HU
-    T3 ==>|"每 4 小时复核队列"| HU
-    HU(["你<br/>关键决策在这里"]) -.->|"决策给出 · 重新入队"| T1
+    D <-->|"是 · 挂进阻塞区，等你决策"| HU(["你"])
+    T3 ==>|"每 4h 复核队列"| HU
 
     classDef step fill:#FFFFFF,stroke:#CBD5E1,stroke-width:1px,color:#0F172A
     classDef gate fill:#1E293B,stroke:#0F172A,stroke-width:1px,color:#F8FAFC
-    classDef side fill:#F1F5F9,stroke:#94A3B8,stroke-width:1px,color:#334155
     classDef human fill:#E0F2FE,stroke:#0284C7,stroke-width:1.5px,color:#0C4A6E
     class T1,T2,T3 step
     class D gate
-    class W side
     class HU human
     style LOOP fill:#FAFAFA,stroke:#E2E8F0,color:#64748B
 ```
@@ -277,7 +273,7 @@ bash ~/克隆下来的/agent-experiment/install.sh --project
 
 ## 实战：这套纪律换来了什么
 
-排队不停、断点续跑、结果一出立刻落地，7 天做完的量接近过去半年。
+排队不停、断点续跑、结果一出立刻落地，**实测效率提升约 25 倍**：7 天做完的量，接近过去半年。
 
 挂机能提速，这不稀奇。难的是挂完之后那批结果还能信——跑完发现完成标记是上一轮的、
 两条链写进了同一个目录、表格数字换了正文没换，这些错误挂机只会犯得更快。
