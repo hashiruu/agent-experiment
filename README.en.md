@@ -48,6 +48,17 @@ Without cloning:
 curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 ```
 
+Or install it as a Claude Code plugin, without touching the shell:
+
+```
+/plugin marketplace add hashiruu/agent-experiment
+/plugin install agent-experiment@agent-experiment
+```
+
+Installed as a plugin the skill is `/agent-experiment:agent-experiment` (plugin skills
+are always namespaced); installed by script it is `/agent-experiment`. Same
+functionality either way, pick one.
+
 Restart Claude Code afterwards. Skills are loaded at session start, so you will
 not see it until you do.
 

@@ -1,0 +1,12 @@
+{
+  "name": "agent-experiment",
+  "description": "给 7×24 小时半自动运行的科研项目装上工作纪律：26 条来自真实事故的规则、三份记录文件、一份长任务监控手册、一个中断还能跑的任务脚本。",
+  "version": "1.1.0",
+  "author": {
+    "name": "hashiruu"
+  },
+  "homepage": "https://github.com/hashiruu/agent-experiment",
+  "repository": "https://github.com/hashiruu/agent-experiment",
+  "license": "CC-BY-NC-4.0",
+  "keywords": ["research", "experiments", "gpu", "latex", "long-running", "discipline"]
+}

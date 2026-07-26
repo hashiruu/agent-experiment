@@ -40,6 +40,16 @@ cd agent-experiment
 curl -fsSL https://raw.githubusercontent.com/hashiruu/agent-experiment/main/install.sh | bash
 ```
 
+也可以当 Claude Code 插件装，不用碰命令行：
+
+```
+/plugin marketplace add hashiruu/agent-experiment
+/plugin install agent-experiment@agent-experiment
+```
+
+插件方式装完，skill 叫 `/agent-experiment:agent-experiment`（插件的 skill 一律带命名空间前缀）；
+上面脚本方式装的则是 `/agent-experiment`。两种装法功能一样，选一种即可。
+
 装完重启 Claude Code。skill 在会话启动时才会被加载，不重启看不见。
 
 然后在要设置的项目里：
