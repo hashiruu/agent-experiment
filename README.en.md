@@ -16,6 +16,15 @@ task script that resumes after an interruption land in place. The rules come out
 of the work behind a real top-tier conference paper: a project that ran unattended
 for a long stretch, and every rule in here has a real incident behind it.
 
+**What it is good for:**
+
+- **Automated workflows**: one chain running for tens of hours, resuming where it
+  stopped, with nobody sitting at the terminal
+- **SOTA experiments**: several baselines running side by side, where every number
+  can be traced back to where it came from
+- **Repetitive runs across seeds and configs**: write them into the queue once, and
+  whichever card frees up picks up the next one
+
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops
 > and waits for you: whether a batch of results can be trusted, whether something
