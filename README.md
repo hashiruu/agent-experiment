@@ -2,7 +2,6 @@
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-2563EB)](README.md)
 [![English](https://img.shields.io/badge/docs-English-64748B)](README.en.md)
-[![ci](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml/badge.svg)](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-EF6C00)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#前置条件)
@@ -14,7 +13,7 @@
 
 **适用场景**：自动化工作流 · SOTA 实验对比 · 多种子多配置的重复性实验。
 
-**可自己验**：[CI 每次 push 端到端重跑](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml) · [一次真实运行的产物](examples/) · [26 条规则原文](skills/agent-experiment/assets/CLAUDE.md) · `deploy.sh --dry-run` 先看再落地。
+**每次真实运行都会留下**：独立的管线目录、起跑时的代码快照、完整日志、权重与指标，以及只在全部成功后才写的完成标记——全程遵守 26 条从真实事故里攒出来的铁律。
 
 > [!WARNING]
 > **它自动化的是执行，不是判断。** 关键决策它会停下来等你：这批结果能不能采信、要不要推到

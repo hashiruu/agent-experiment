@@ -2,7 +2,6 @@
 
 [![简体中文](https://img.shields.io/badge/文档-简体中文-64748B)](README.md)
 [![English](https://img.shields.io/badge/docs-English-2563EB)](README.en.md)
-[![ci](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml/badge.svg)](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml)
 [![License: CC BY-NC 4.0](https://img.shields.io/badge/License-CC%20BY--NC%204.0-EF6C00)](LICENSE)
 [![Claude Code Skill](https://img.shields.io/badge/Claude%20Code-Skill-8A63D2)](https://docs.claude.com/en/docs/claude-code/skills)
 [![Platform: Linux](https://img.shields.io/badge/Platform-Linux-lightgrey)](#requirements)
@@ -19,7 +18,7 @@ for a long stretch, and every rule in here has a real incident behind it.
 
 **Use it for**: automated workflows · SOTA baselines side by side · repeated runs across seeds and configs.
 
-**Check it yourself**: [CI runs end to end on every push](https://github.com/hashiruu/agent-experiment/actions/workflows/ci.yml) · [artifacts from a real run](examples/) · [all 26 rules](skills/agent-experiment/assets/CLAUDE.md) · `deploy.sh --dry-run` before anything is written.
+**Every real run leaves behind**: its own pipeline directory, a snapshot of the code as it was at launch, the full log, the weights and the metric, and a completion marker written only after everything succeeded — under 26 rules that were each paid for by a real incident.
 
 > [!WARNING]
 > **This automates execution, not judgement.** On a decision that matters it stops

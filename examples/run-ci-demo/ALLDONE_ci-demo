@@ -1,4 +1,0 @@
-tag=ci-demo  gpu=0  started=2026-07-26 14:13:59
-finished=2026-07-26 14:13:59  elapsed_min=0
-code_snapshot=results/ci-demo/code   log=logs/ci-demo.log
-# 在此逐行写下本次的关键配置与结果, 供事后核对声明与实际是否一致
